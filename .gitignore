@@ -1,0 +1,50 @@
+# 依赖目录
+node_modules/
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+
+# 日志文件
+logs/
+*.log
+npm-debug.log*
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE配置
+.vscode/
+.idea/
+*.swp
+*.swo
+*.suo
+*.sln
+*.user
+*.cache
+
+# 测试目录
+coverage/
+.nyc_output/
+
+# 构建产物
+dist/
+build/
+*.exe
+*.dll
+
+# 临时文件
+temp/
+tmp/
+*.tmp
+
+# 数据库文件
+*.db
+*.sqlite
+
+# 编辑器备份
+*~
+*.bak

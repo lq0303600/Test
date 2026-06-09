@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园智能咨询问答平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .auth-section {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            color: white;
+        }
+
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: #fafafa;
+        }
+
+        .chat-message {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .chat-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .chat-message.user .chat-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .chat-message.bot .chat-avatar {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .chat-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .chat-message.user .chat-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px 16px 4px 16px;
+        }
+
+        .chat-message.bot .chat-content {
+            background: white;
+            color: #333;
+            border-radius: 16px 16px 16px 4px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .chat-input {
+            padding: 12px;
+            border-top: 2px solid #e0e0e0;
+            background: white;
+        }
+
+        .chat-input textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            resize: none;
+            min-height: 60px;
+            font-family: inherit;
+        }
+
+        .chat-input textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .knowledge-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .knowledge-item {
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .knowledge-item:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .knowledge-item h4 {
+            color: #333;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .knowledge-item p {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .knowledge-item .category {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 14px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .history-item:hover {
+            background: #fafafa;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item h4 {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .history-item p {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .source-tag {
+            font-size: 11px;
+            color: #999;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #667eea;
+        }
+
+        .loading-circle {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #667eea;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 校园智能咨询问答平台</h1>
+            <p>基于AI技术的智能问答系统，为您提供校园相关问题的快速解答</p>
+            <div id="authArea">
+                <div class="auth-section">
+                    <button class="btn btn-primary" onclick="showLogin()">登录</button>
+                    <button class="btn btn-secondary" onclick="showRegister()">注册</button>
+                </div>
+            </div>
+            <div id="userArea" style="display: none;">
+                <div class="user-info">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2'%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H4a4 4 0 0 0-4 4v2'/%3E%3C/svg%3E" alt="头像">
+                    <div>
+                        <div id="userName">用户</div>
+                        <div style="font-size: 12px; opacity: 0.8;" id="userRole">学生</div>
+                    </div>
+                    <button class="btn btn-sm btn-secondary" onclick="logout()" style="margin-left: auto;">退出</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div>
+                <div class="card">
+                    <div class="card-title">💬 智能问答</div>
+                    
+                    <div id="chatContainer" class="chat-container">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="chat-message bot">
+                                <div class="chat-avatar">🤖</div>
+                                <div class="chat-content">
+                                    您好！我是校园智能助手，请问有什么可以帮助您的？
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input">
+                            <textarea id="chatInput" placeholder="请输入您的问题..." onkeydown="handleKeyDown(event)"></textarea>
+                            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                                <button class="btn btn-primary" onclick="sendMessage()">
+                                    <span>发送</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-title">📚 问答历史</div>
+                    <div class="history-list" id="historyList">
+                        <div class="empty-state">
+                            暂无问答历史，请先提问
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="card">
+                    <div class="tabs">
+                        <button class="tab active" onclick="showKnowledge()">知识库</button>
+                        <button class="tab" onclick="showLoginForm()">登录</button>
+                        <button class="tab" onclick="showRegisterForm()">注册</button>
+                    </div>
+                    
+                    <div id="tabContent">
+                        <div id="knowledgePanel">
+                            <input type="text" id="searchInput" placeholder="搜索知识库..." style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 16px;" onkeyup="searchKnowledge()">
+                            <div class="knowledge-list" id="knowledgeList">
+                                <div class="loading">
+                                    <div class="loading-circle"></div>
+                                    加载中...
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="loginPanel" style="display: none;">
+                            <div class="form-group">
+                                <label>用户名</label>
+                                <input type="text" id="loginUsername" placeholder="请输入用户名">
+                            </div>
+                            <div class="form-group">
+                                <label>密码</label>
+                                <input type="password" id="loginPassword" placeholder="请输入密码">
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="login()">登录</button>
+                            <p style="text-align: center; margin-top: 16px; color: #666; font-size: 13px;">
+                                还没有账号？<a href="#" onclick="showRegisterForm(); return false;">立即注册</a>
+                            </p>
+                        </div>
+
+                        <div id="registerPanel" style="display: none;">
+                            <div class="form-group">
+                                <label>用户名</label>
+                                <input type="text" id="registerUsername" placeholder="请输入用户名">
+                            </div>
+                            <div class="form-group">
+                                <label>密码</label>
+                                <input type="password" id="registerPassword" placeholder="请输入密码">
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="register()">注册</button>
+                            <p style="text-align: center; margin-top: 16px; color: #666; font-size: 13px;">
+                                已有账号？<a href="#" onclick="showLoginForm(); return false;">立即登录</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        let token = localStorage.getItem('token');
+        let currentUserId = localStorage.getItem('userId');
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            if (token) {
+                loadUserInfo();
+                loadKnowledge();
+                loadHistory();
+            } else {
+                loadKnowledge();
+            }
+        });
+
+        // 加载用户信息
+        function loadUserInfo() {
+            fetch(`${API_BASE}/users/me`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.code === 0) {
+                    document.getElementById('authArea').style.display = 'none';
+                    document.getElementById('userArea').style.display = 'flex';
+                    document.getElementById('userName').textContent = data.data.nickname;
+                    document.getElementById('userRole').textContent = data.data.role === 'admin' ? '管理员' : data.data.role === 'teacher' ? '教师' : '学生';
+                    currentUserId = data.data.id;
+                }
+            });
+        }
+
+        // 登录
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            fetch(`${API_BASE}/users/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json; charset=utf-8' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('网络请求失败，请检查网络连接');
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.code === 0) {
+                    token = data.data.token;
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('userId', data.data.user.id);
+                    currentUserId = data.data.user.id;
+                    loadUserInfo();
+                    loadHistory();
+                    showKnowledge();
+                    showMessage('登录成功！', 'success');
+                } else {
+                    showMessage(data.message || '登录失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('登录错误:', error);
+                showMessage('登录失败，请检查网络连接或稍后重试', 'error');
+            });
+        }
+
+        // 注册
+        function register() {
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+
+            fetch(`${API_BASE}/users/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json; charset=utf-8' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('网络请求失败，请检查网络连接');
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.code === 0) {
+                    showMessage('注册成功！请登录', 'success');
+                    showLoginForm();
+                } else {
+                    showMessage(data.message || '注册失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('注册错误:', error);
+                showMessage('注册失败，请检查网络连接或稍后重试', 'error');
+            });
+        }
+
+        // 退出
+        function logout() {
+            token = null;
+            currentUserId = null;
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            document.getElementById('authArea').style.display = 'flex';
+            document.getElementById('userArea').style.display = 'none';
+            document.getElementById('historyList').innerHTML = '<div class="empty-state">暂无问答历史，请先提问</div>';
+            showMessage('已退出登录', 'success');
+        }
+
+        // 发送消息
+        function sendMessage() {
+            const content = document.getElementById('chatInput').value.trim();
+            if (!content) return;
+
+            if (!token) {
+                showMessage('请先登录', 'error');
+                return;
+            }
+
+            // 添加用户消息
+            addMessage(content, 'user');
+            document.getElementById('chatInput').value = '';
+
+            // 显示加载状态
+            addMessage('<div class="loading"><div class="loading-circle"></div>思考中...</div>', 'bot', true);
+
+            fetch(`${API_BASE}/qa/ask`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ title: content.substring(0, 50), content })
+            })
+            .then(res => res.json())
+            .then(data => {
+                // 移除加载消息
+                const messages = document.getElementById('chatMessages');
+                messages.removeChild(messages.lastChild);
+
+                if (data.code === 0) {
+                    addMessage(data.data.answer.content, 'bot', false, data.data.answer.source);
+                    loadHistory();
+                } else {
+                    addMessage('抱歉，无法回答您的问题', 'bot');
+                }
+            });
+        }
+
+        // 添加消息
+        function addMessage(content, type, isLoading = false, source = '') {
+            const messages = document.getElementById('chatMessages');
+            const message = document.createElement('div');
+            message.className = `chat-message ${type}`;
+            
+            const sourceText = source === 'knowledge_base' ? '（知识库）' : source === 'ai' ? '（AI）' : '';
+            
+            message.innerHTML = `
+                <div class="chat-avatar">${type === 'user' ? '👤' : '🤖'}</div>
+                <div class="chat-content">${isLoading ? content : escapeHtml(content)}${!isLoading && source ? `<div class="source-tag">来源：${source === 'knowledge_base' ? '知识库' : 'AI'}</div>` : ''}</div>
+            `;
+            
+            messages.appendChild(message);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // 加载知识库
+        function loadKnowledge() {
+            fetch(`${API_BASE}/knowledge/list`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.code === 0) {
+                    renderKnowledge(data.data.list);
+                }
+            });
+        }
+
+        // 搜索知识库
+        function searchKnowledge() {
+            const keyword = document.getElementById('searchInput').value.trim();
+            const url = keyword ? `${API_BASE}/knowledge/list?keyword=${encodeURIComponent(keyword)}` : `${API_BASE}/knowledge/list`;
+            
+            fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (data.code === 0) {
+                    renderKnowledge(data.data.list);
+                }
+            });
+        }
+
+        // 渲染知识库
+        function renderKnowledge(list) {
+            const container = document.getElementById('knowledgeList');
+            if (list.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无知识库内容</div>';
+                return;
+            }
+
+            container.innerHTML = list.map(item => `
+                <div class="knowledge-item" onclick="viewKnowledge(${item.id})">
+                    <h4>${escapeHtml(item.title)}</h4>
+                    <p>${escapeHtml(item.content)}</p>
+                    <span class="category">${getCategoryName(item.category)}</span>
+                </div>
+            `).join('');
+        }
+
+        // 获取分类名称
+        function getCategoryName(category) {
+            const map = {
+                admission: '入学',
+                academic: '学术',
+                campus: '校园',
+                career: '就业',
+                life: '生活',
+                other: '其他'
+            };
+            return map[category] || '其他';
+        }
+
+        // 查看知识库详情
+        function viewKnowledge(id) {
+            fetch(`${API_BASE}/knowledge/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.code === 0) {
+                    const item = data.data;
+                    addMessage(`**${escapeHtml(item.title)}**\n\n${escapeHtml(item.content)}`, 'bot', false, 'knowledge_base');
+                }
+            });
+        }
+
+        // 加载历史
+        function loadHistory() {
+            if (!token) return;
+
+            fetch(`${API_BASE}/qa/history`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.code === 0) {
+                    renderHistory(data.data.list);
+                }
+            });
+        }
+
+        // 渲染历史
+        function renderHistory(list) {
+            const container = document.getElementById('historyList');
+            if (list.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无问答历史</div>';
+                return;
+            }
+
+            container.innerHTML = list.map(item => `
+                <div class="history-item" onclick="loadQuestionDetail(${item.id})">
+                    <h4>${escapeHtml(item.title)} <span class="badge badge-success">已回答</span></h4>
+                    <p>${escapeHtml(item.created_at)}</p>
+                </div>
+            `).join('');
+        }
+
+        // 加载问题详情
+        function loadQuestionDetail(id) {
+            if (!token) return;
+
+            fetch(`${API_BASE}/qa/questions/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.code === 0) {
+                    const item = data.data;
+                    addMessage(escapeHtml(item.content), 'user');
+                    addMessage(escapeHtml(item.answer_content), 'bot', false, item.answer_source);
+                }
+            });
+        }
+
+        // 显示消息
+        function showMessage(msg, type) {
+            const container = document.querySelector('.card');
+            const div = document.createElement('div');
+            div.className = type === 'success' ? 'success-message' : 'error-message';
+            div.textContent = msg;
+            container.insertBefore(div, container.firstChild);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        // HTML转义
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 键盘事件
+        function handleKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Tab切换
+        function showKnowledge() {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.getElementById('knowledgePanel').style.display = 'block';
+            document.getElementById('loginPanel').style.display = 'none';
+            document.getElementById('registerPanel').style.display = 'none';
+        }
+
+        function showLoginForm() {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.getElementById('knowledgePanel').style.display = 'none';
+            document.getElementById('loginPanel').style.display = 'block';
+            document.getElementById('registerPanel').style.display = 'none';
+        }
+
+        function showRegisterForm() {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab')[2].classList.add('active');
+            document.getElementById('knowledgePanel').style.display = 'none';
+            document.getElementById('loginPanel').style.display = 'none';
+            document.getElementById('registerPanel').style.display = 'block';
+        }
+
+        function showLogin() {
+            showLoginForm();
+        }
+
+        function showRegister() {
+            showRegisterForm();
+        }
+    </script>
+</body>
+</html>

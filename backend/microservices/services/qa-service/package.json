@@ -1,0 +1,17 @@
+{
+  "name": "campus-qa-service",
+  "version": "1.0.0",
+  "description": "问答发布服务微服务 - 用户提交咨询问题、查询历史问答、跟踪问题处理状态",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "mysql2": "^3.6.5",
+    "axios": "^1.6.2",
+    "winston": "^3.11.0"
+  }
+}

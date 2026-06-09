@@ -1,0 +1,150 @@
+version: '3.8'
+
+services:
+  # MySQL数据库
+  mysql:
+    image: mysql:8.0
+    container_name: campus-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Lq200603
+      MYSQL_DATABASE: campus_qa_platform
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  # 用户服务
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    container_name: campus-user-service
+    environment:
+      PORT: 3001
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: Lq200603
+      DB_NAME: campus_qa_platform
+    ports:
+      - "3001:3001"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # 知识库服务
+  knowledge-service:
+    build:
+      context: ./services/knowledge-service
+      dockerfile: Dockerfile
+    container_name: campus-knowledge-service
+    environment:
+      PORT: 3002
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: Lq200603
+      DB_NAME: campus_qa_platform
+    ports:
+      - "3002:3002"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # AI服务
+  ai-service:
+    build:
+      context: ./services/ai-service
+      dockerfile: Dockerfile
+    container_name: campus-ai-service
+    environment:
+      PORT: 3004
+      KNOWLEDGE_SERVICE_URL: http://knowledge-service:3002
+      DEEPSEEK_API_KEY: sk-86165900516a4017a61aaaf062cfd73c
+    ports:
+      - "3004:3004"
+    restart: unless-stopped
+
+  # 问答服务
+  qa-service:
+    build:
+      context: ./services/qa-service
+      dockerfile: Dockerfile
+    container_name: campus-qa-service
+    environment:
+      PORT: 3003
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: Lq200603
+      DB_NAME: campus_qa_platform
+      USER_SERVICE_URL: http://user-service:3001
+      KNOWLEDGE_SERVICE_URL: http://knowledge-service:3002
+      AI_SERVICE_URL: http://ai-service:3004
+      MESSAGE_SERVICE_URL: http://message-service:3005
+    ports:
+      - "3003:3003"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+      knowledge-service:
+        condition: service_started
+      ai-service:
+        condition: service_started
+      message-service:
+        condition: service_started
+    restart: unless-stopped
+
+  # 消息服务
+  message-service:
+    build:
+      context: ./services/message-service
+      dockerfile: Dockerfile
+    container_name: campus-message-service
+    environment:
+      PORT: 3005
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: Lq200603
+      DB_NAME: campus_qa_platform
+    ports:
+      - "3005:3005"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # API网关
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: campus-gateway
+    environment:
+      PORT: 3000
+      USER_SERVICE_URL: http://user-service:3001
+      KNOWLEDGE_SERVICE_URL: http://knowledge-service:3002
+      QA_SERVICE_URL: http://qa-service:3003
+      AI_SERVICE_URL: http://ai-service:3004
+      MESSAGE_SERVICE_URL: http://message-service:3005
+    ports:
+      - "3000:3000"
+    depends_on:
+      - user-service
+      - knowledge-service
+      - qa-service
+      - ai-service
+      - message-service
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
