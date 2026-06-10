@@ -1,4 +1,5 @@
 const AIService = require('../services/aiService');
+const WeatherService = require('../services/weatherService');
 
 const AIController = {
   /**
@@ -119,6 +120,34 @@ const AIController = {
       res.json({ code: 0, data: results });
     } catch (error) {
       res.status(500).json({ code: 500, message: error.message });
+    }
+  },
+
+  /**
+   * 获取当前天气
+   */
+  async getWeather(req, res) {
+    try {
+      const { city = '北京' } = req.query;
+      const weather = await WeatherService.getWeather(city);
+      res.json({ code: 0, message: '获取成功', data: weather });
+    } catch (error) {
+      console.error('获取天气失败:', error);
+      res.status(500).json({ code: 500, message: '获取天气失败', error: error.message });
+    }
+  },
+
+  /**
+   * 获取天气预报
+   */
+  async getWeatherForecast(req, res) {
+    try {
+      const { city = '北京', days = 3 } = req.query;
+      const forecast = await WeatherService.getWeatherForecast(city, parseInt(days));
+      res.json({ code: 0, message: '获取成功', data: forecast });
+    } catch (error) {
+      console.error('获取天气预报失败:', error);
+      res.status(500).json({ code: 500, message: '获取天气预报失败', error: error.message });
     }
   }
 };
