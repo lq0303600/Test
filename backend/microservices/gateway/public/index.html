@@ -1619,6 +1619,30 @@
         let currentUser = null;
         let userRole = localStorage.getItem('userRole') || 'student';
         
+        // 全局作业数据
+        let homeworkData = [
+            { id: 1, title: '第三章课后习题', course: '高等数学A', publisher: '王教授', publishTime: '2026-06-01', deadline: '2026-06-10', submitted: 85, total: 120, status: '进行中', isMine: true },
+            { id: 2, title: '矩阵运算练习', course: '线性代数', publisher: '张教授', publishTime: '2026-05-28', deadline: '2026-06-05', submitted: 90, total: 95, status: '进行中', isMine: true },
+            { id: 3, title: '函数求导综合练习', course: '高等数学A', publisher: '李老师', publishTime: '2026-05-20', deadline: '2026-05-28', submitted: 118, total: 120, status: '已结束', isMine: false },
+            { id: 4, title: '向量空间习题', course: '线性代数', publisher: '王教授', publishTime: '2026-05-15', deadline: '2026-05-22', submitted: 93, total: 95, status: '已结束', isMine: true },
+            { id: 5, title: '不定积分练习', course: '高等数学A', publisher: '王教授', publishTime: '2026-06-08', deadline: '2026-06-15', submitted: 45, total: 120, status: '进行中', isMine: true },
+            { id: 6, title: '级数收敛性判断', course: '高等数学A', publisher: '刘老师', publishTime: '2026-06-05', deadline: '2026-06-12', submitted: 78, total: 115, status: '进行中', isMine: false },
+            { id: 7, title: '特征值与特征向量', course: '线性代数', publisher: '陈老师', publishTime: '2026-06-03', deadline: '2026-06-10', submitted: 65, total: 95, status: '进行中', isMine: false },
+            { id: 8, title: '物理实验报告', course: '大学物理', publisher: '王教授', publishTime: '2026-06-06', deadline: '2026-06-18', submitted: 32, total: 88, status: '进行中', isMine: true }
+        ];
+        
+        // 全局考勤记录数据
+        let attendanceRecordsData = [
+            { id: 1, course: '高等数学A', date: '2026-06-10', timeSlot: '08:00-09:40', status: '已结束', publisher: '王教授', attendance: 115, leave: 3, absent: 2, isMine: true },
+            { id: 2, course: '线性代数', date: '2026-06-10', timeSlot: '14:00-15:40', status: '进行中', publisher: '张教授', attendance: 45, leave: 2, absent: 0, isMine: true },
+            { id: 3, course: '高等数学A', date: '2026-06-08', timeSlot: '08:00-09:40', status: '已结束', publisher: '王教授', attendance: 112, leave: 4, absent: 4, isMine: true },
+            { id: 4, course: '大学物理', date: '2026-06-09', timeSlot: '10:00-11:40', status: '已结束', publisher: '刘老师', attendance: 78, leave: 5, absent: 5, isMine: false },
+            { id: 5, course: '线性代数', date: '2026-06-07', timeSlot: '08:00-09:40', status: '已结束', publisher: '王教授', attendance: 90, leave: 3, absent: 2, isMine: true },
+            { id: 6, course: '大学英语', date: '2026-06-10', timeSlot: '16:00-17:40', status: '进行中', publisher: '李老师', attendance: 32, leave: 1, absent: 3, isMine: false },
+            { id: 7, course: '大学物理', date: '2026-06-10', timeSlot: '08:00-09:40', status: '已结束', publisher: '王教授', attendance: 82, leave: 4, absent: 2, isMine: true },
+            { id: 8, course: '大学英语', date: '2026-06-08', timeSlot: '10:00-11:40', status: '已结束', publisher: '陈老师', attendance: 85, leave: 2, absent: 8, isMine: false }
+        ];
+        
         // 定时刷新定时器
         let userInfoRefreshTimer = null;
         let noticeRefreshTimer = null;
@@ -5854,17 +5878,6 @@
 
         // 作业管理 - 加载作业列表
         function loadHomework(filter = 'all') {
-            const homeworkData = [
-                { id: 1, title: '第三章课后习题', course: '高等数学A', publisher: '王教授', publishTime: '2026-06-01', deadline: '2026-06-10', submitted: 85, total: 120, status: '进行中', isMine: true },
-                { id: 2, title: '矩阵运算练习', course: '线性代数', publisher: '张教授', publishTime: '2026-05-28', deadline: '2026-06-05', submitted: 90, total: 95, status: '进行中', isMine: true },
-                { id: 3, title: '函数求导综合练习', course: '高等数学A', publisher: '李老师', publishTime: '2026-05-20', deadline: '2026-05-28', submitted: 118, total: 120, status: '已结束', isMine: false },
-                { id: 4, title: '向量空间习题', course: '线性代数', publisher: '王教授', publishTime: '2026-05-15', deadline: '2026-05-22', submitted: 93, total: 95, status: '已结束', isMine: true },
-                { id: 5, title: '不定积分练习', course: '高等数学A', publisher: '王教授', publishTime: '2026-06-08', deadline: '2026-06-15', submitted: 45, total: 120, status: '进行中', isMine: true },
-                { id: 6, title: '级数收敛性判断', course: '高等数学A', publisher: '刘老师', publishTime: '2026-06-05', deadline: '2026-06-12', submitted: 78, total: 115, status: '进行中', isMine: false },
-                { id: 7, title: '特征值与特征向量', course: '线性代数', publisher: '陈老师', publishTime: '2026-06-03', deadline: '2026-06-10', submitted: 65, total: 95, status: '进行中', isMine: false },
-                { id: 8, title: '物理实验报告', course: '大学物理', publisher: '王教授', publishTime: '2026-06-06', deadline: '2026-06-18', submitted: 32, total: 88, status: '进行中', isMine: true }
-            ];
-            
             const filteredData = filter === 'mine' ? homeworkData.filter(hw => hw.isMine) : homeworkData;
             
             let html = '';
@@ -5886,6 +5899,10 @@
 
         // 结束作业
         function endHomework(id) {
+            const hw = homeworkData.find(h => h.id === id);
+            if (hw) {
+                hw.status = '已结束';
+            }
             showToast('作业已结束', 'success');
             loadHomework();
         }
@@ -5903,29 +5920,51 @@
         // 发布作业
         function publishHomework() {
             const title = document.getElementById('homeworkTitle').value;
+            const course = document.getElementById('homeworkCourse').value;
+            const content = document.getElementById('homeworkContent').value;
+            const deadline = document.getElementById('homeworkDeadline').value;
+            
             if (!title) {
                 showToast('请输入作业标题', 'error');
                 return;
             }
+            if (!deadline) {
+                showToast('请设置截止时间', 'error');
+                return;
+            }
+            
+            const now = new Date();
+            const publishTime = now.toISOString().split('T')[0];
+            const deadlineDate = deadline.replace('T', ' ');
+            
+            const newHomework = {
+                id: homeworkData.length + 1,
+                title: title,
+                course: course,
+                publisher: '王教授',
+                publishTime: publishTime,
+                deadline: deadline.split('T')[0],
+                submitted: 0,
+                total: course === '高等数学A' ? 120 : (course === '线性代数' ? 95 : (course === '大学物理' ? 88 : 90)),
+                status: '进行中',
+                isMine: true
+            };
+            
+            homeworkData.unshift(newHomework);
+            
             showToast('作业发布成功', 'success');
             closePublishHomework();
+            
+            document.getElementById('homeworkTitle').value = '';
+            document.getElementById('homeworkContent').value = '';
+            document.getElementById('homeworkDeadline').value = '';
+            
             loadHomework();
         }
 
         // 考勤管理 - 加载考勤记录列表
         function loadAttendanceRecords(filter = 'all') {
-            const attendanceRecords = [
-                { id: 1, course: '高等数学A', date: '2026-06-10', timeSlot: '08:00-09:40', status: '已结束', publisher: '王教授', attendance: 115, leave: 3, absent: 2, isMine: true },
-                { id: 2, course: '线性代数', date: '2026-06-10', timeSlot: '14:00-15:40', status: '进行中', publisher: '张教授', attendance: 45, leave: 2, absent: 0, isMine: true },
-                { id: 3, course: '高等数学A', date: '2026-06-08', timeSlot: '08:00-09:40', status: '已结束', publisher: '王教授', attendance: 112, leave: 4, absent: 4, isMine: true },
-                { id: 4, course: '大学物理', date: '2026-06-09', timeSlot: '10:00-11:40', status: '已结束', publisher: '刘老师', attendance: 78, leave: 5, absent: 5, isMine: false },
-                { id: 5, course: '线性代数', date: '2026-06-07', timeSlot: '08:00-09:40', status: '已结束', publisher: '王教授', attendance: 90, leave: 3, absent: 2, isMine: true },
-                { id: 6, course: '大学英语', date: '2026-06-10', timeSlot: '16:00-17:40', status: '进行中', publisher: '李老师', attendance: 32, leave: 1, absent: 3, isMine: false },
-                { id: 7, course: '大学物理', date: '2026-06-10', timeSlot: '08:00-09:40', status: '已结束', publisher: '王教授', attendance: 82, leave: 4, absent: 2, isMine: true },
-                { id: 8, course: '大学英语', date: '2026-06-08', timeSlot: '10:00-11:40', status: '已结束', publisher: '陈老师', attendance: 85, leave: 2, absent: 8, isMine: false }
-            ];
-            
-            const filteredData = filter === 'mine' ? attendanceRecords.filter(record => record.isMine) : attendanceRecords;
+            const filteredData = filter === 'mine' ? attendanceRecordsData.filter(record => record.isMine) : attendanceRecordsData;
             
             let html = '<table class="data-table"><thead><tr><th>课程</th><th>日期</th><th>时间段</th><th>出勤/请假/缺勤</th><th>发布人</th><th>状态</th><th>操作</th></tr></thead><tbody>';
             filteredData.forEach(record => {
@@ -5946,6 +5985,10 @@
         
         // 结束考勤记录
         function endAttendanceRecord(id) {
+            const record = attendanceRecordsData.find(r => r.id === id);
+            if (record) {
+                record.status = '已结束';
+            }
             showToast('考勤已结束', 'success');
             loadAttendanceRecords();
         }
@@ -6117,12 +6160,69 @@
 
         // 开始考勤
         function startAttendance() {
+            const course = document.getElementById('attendanceCourse').value;
+            const date = document.getElementById('attendanceDate').value || new Date().toISOString().split('T')[0];
+            
+            const courseNames = {
+                math: '高等数学A',
+                linear: '线性代数',
+                physics: '大学物理',
+                english: '大学英语'
+            };
+            
+            const timeSlots = {
+                math: '08:00-09:40',
+                linear: '14:00-15:40',
+                physics: '10:00-11:40',
+                english: '16:00-17:40'
+            };
+            
+            const totalStudents = {
+                math: 120,
+                linear: 95,
+                physics: 88,
+                english: 90
+            };
+            
+            const newRecord = {
+                id: attendanceRecordsData.length + 1,
+                course: courseNames[course],
+                date: date,
+                timeSlot: timeSlots[course],
+                status: '进行中',
+                publisher: '王教授',
+                attendance: 0,
+                leave: 0,
+                absent: totalStudents[course],
+                isMine: true
+            };
+            
+            attendanceRecordsData.unshift(newRecord);
+            
             showToast('考勤已开始', 'success');
+            loadAttendanceRecords();
         }
 
         // 结束考勤
         function endAttendance() {
+            const course = document.getElementById('attendanceCourse').value;
+            const date = document.getElementById('attendanceDate').value || new Date().toISOString().split('T')[0];
+            
+            const courseNames = {
+                math: '高等数学A',
+                linear: '线性代数',
+                physics: '大学物理',
+                english: '大学英语'
+            };
+            
+            const record = attendanceRecordsData.find(r => r.course === courseNames[course] && r.date === date && r.status === '进行中');
+            if (record) {
+                record.status = '已结束';
+            }
+            
             showToast('考勤已结束', 'success');
+            loadAttendanceRecords();
+            loadAttendance();
         }
 
         // 显示重点人员
