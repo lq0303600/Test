@@ -790,12 +790,16 @@
                 <div class="card">
                     <div class="card-header">
                         <span class="card-title">🔧 报修通道</span>
-                        <button onclick="showRepairForm()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">+ 提交报修</button>
+                        <button onclick="showRepairForm()" style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer;">+ 提交报修</button>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
-                        <div style="padding: 20px; background: #e8f5e9; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #4caf50;" id="repairCompleted">12</p><p style="color: #666;">已完成</p></div>
-                        <div style="padding: 20px; background: #fff3e0; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #ff9800;" id="repairProcessing">5</p><p style="color: #666;">处理中</p></div>
-                        <div style="padding: 20px; background: #e3f2fd; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #2196f3;" id="repairPending">3</p><p style="color: #666;">待处理</p></div>
+                        <div style="padding: 20px; background: #e8f5e9; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #4caf50;" id="repairCompleted">0</p><p style="color: #666;">已完成</p></div>
+                        <div style="padding: 20px; background: #fff3e0; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #ff9800;" id="repairProcessing">0</p><p style="color: #666;">处理中</p></div>
+                        <div style="padding: 20px; background: #e3f2fd; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #2196f3;" id="repairPending">0</p><p style="color: #666;">待处理</p></div>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <button onclick="showRepairmanInfo()" style="padding: 8px 16px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">👷 查看维修员</button>
+                        <span style="font-size: 13px; color: #666;">查看维修人员信息和预约维修时间</span>
                     </div>
                     <div id="repairContent">
                         <p style="text-align: center; color: #999; padding: 40px;">加载中...</p>
@@ -803,7 +807,7 @@
                 </div>
                 <div class="card" style="margin-top: 20px;">
                     <div class="card-header">
-                        <span class="card-title">👷 修理员信息</span>
+                        <span class="card-title">👷 维修人员信息</span>
                     </div>
                     <div id="repairmanList">
                     </div>
@@ -1451,25 +1455,47 @@
                 <div class="card">
                     <div class="card-header">
                         <span class="card-title">📚 图书借阅</span>
-                        <input type="text" id="librarySearch" placeholder="搜索图书..." style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px; width: 200px;" onkeyup="searchLibrary()">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <select id="bookCategory" style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px;" onchange="filterBooks()">
+                                <option value="all">全部分类</option>
+                                <option value="计算机">计算机</option>
+                                <option value="数学">数学</option>
+                                <option value="物理">物理</option>
+                                <option value="文学">文学</option>
+                                <option value="历史">历史</option>
+                                <option value="其他">其他</option>
+                            </select>
+                            <input type="text" id="librarySearch" placeholder="搜索书名、作者、ISBN..." style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px; width: 250px;" onkeyup="filterBooks()">
+                        </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
                         <div style="padding: 20px; background: #e8f5e9; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #4caf50;" id="libraryTotal">12580</p><p style="color: #666;">馆藏总量</p></div>
                         <div style="padding: 20px; background: #e3f2fd; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #2196f3;" id="libraryBorrowed">3256</p><p style="color: #666;">已借出</p></div>
                         <div style="padding: 20px; background: #fff3e0; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #ff9800;" id="libraryMyBorrow">5</p><p style="color: #666;">我的借阅</p></div>
+                        <div style="padding: 20px; background: #fce4ec; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #e91e63;" id="libraryReserved">0</p><p style="color: #666;">我的预约</p></div>
                     </div>
                     <div style="margin-bottom: 20px;">
                         <button onclick="showLibraryTab('search')" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">🔍 图书检索</button>
                         <button onclick="showLibraryTab('borrowed')" style="padding: 8px 16px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">📖 我的借阅</button>
+                        <button onclick="showLibraryTab('reserved')" style="padding: 8px 16px; background: #e91e63; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">📋 我的预约</button>
                         <button onclick="showLibraryTab('history')" style="padding: 8px 16px; background: #9c27b0; color: white; border: none; border-radius: 6px; cursor: pointer;">📜 借阅历史</button>
                     </div>
                     <div id="libraryContent">
                         <div id="librarySearchContent">
-                            <table class="data-table">
-                                <thead><tr><th>书名</th><th>作者</th><th>ISBN</th><th>馆藏位置</th><th>状态</th><th>操作</th></tr></thead>
-                                <tbody id="libraryTable">
-                                </tbody>
-                            </table>
+                            <div id="booksGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                            </div>
+                        </div>
+                        <div id="libraryBorrowedContent" class="hidden">
+                            <div id="borrowedBooksList">
+                            </div>
+                        </div>
+                        <div id="libraryReservedContent" class="hidden">
+                            <div id="reservedBooksList">
+                            </div>
+                        </div>
+                        <div id="libraryHistoryContent" class="hidden">
+                            <div id="historyBooksList">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1504,35 +1530,38 @@
             
             <!-- 报修表单模态框 -->
             <div id="repairFormModal" class="modal hidden">
-                <div class="modal-content">
+                <div class="modal-content" style="max-width: 500px;">
                     <div class="modal-header">
-                        <span class="modal-title">提交报修</span>
+                        <span class="modal-title">🔧 提交报修</span>
                         <div class="modal-close" onclick="document.getElementById('repairFormModal').classList.add('hidden')">×</div>
                     </div>
-                    <div>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-size: 14px;">报修标题</label>
-                            <input type="text" id="repairTitle" placeholder="请输入报修标题" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                    <div style="padding: 20px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: #333;">报修标题 <span style="color: #f44336;">*</span></label>
+                            <input type="text" id="repairTitle" placeholder="请输入简短的报修标题，如：宿舍空调不制冷" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
                         </div>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-size: 14px;">报修地点</label>
-                            <input type="text" id="repairLocation" placeholder="请输入地点" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: #333;">报修地点 <span style="color: #f44336;">*</span></label>
+                            <input type="text" id="repairLocation" placeholder="请输入详细地址，如：宿舍2号楼304室" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
                         </div>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-size: 14px;">报修分类</label>
-                            <select id="repairCategory" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
-                                <option value="电器">电器维修</option>
-                                <option value="水管">水管维修</option>
-                                <option value="门窗">门窗维修</option>
-                                <option value="多媒体">多媒体设备</option>
-                                <option value="其他">其他</option>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: #333;">报修分类</label>
+                            <select id="repairCategory" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+                                <option value="电器">🔌 电器维修（空调、灯、风扇等）</option>
+                                <option value="水管">💧 水管维修（水龙头、管道等）</option>
+                                <option value="门窗">🚪 门窗维修（门锁、窗户等）</option>
+                                <option value="多媒体">📺 多媒体设备（投影仪、电脑等）</option>
+                                <option value="家具">🪑 家具维修（桌椅、床等）</option>
+                                <option value="网络">🌐 网络故障</option>
+                                <option value="其他">📝 其他</option>
                             </select>
                         </div>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-size: 14px;">详细描述</label>
-                            <textarea id="repairDesc" placeholder="请详细描述问题..." rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; resize: none;"></textarea>
+                        <div style="margin-bottom: 25px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: #333;">详细描述 <span style="color: #f44336;">*</span></label>
+                            <textarea id="repairDesc" placeholder="请详细描述问题，包括故障现象、发现时间等，以便维修人员快速处理..." rows="5" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; resize: vertical; font-size: 14px; line-height: 1.6;"></textarea>
                         </div>
-                        <button onclick="submitRepair()" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">提交报修</button>
+                        <button onclick="submitRepair()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 500;">提交报修</button>
+                        <p style="text-align: center; margin-top: 15px; font-size: 12px; color: #999;">提交后，维修人员将在24小时内联系您</p>
                     </div>
                 </div>
             </div>
@@ -4847,91 +4876,134 @@
             document.getElementById('lostFoundContent').innerHTML = items.length ? html : '<p style="text-align:center;color:#999;">暂无失物招领信息</p>';
         }
 
-        // 加载报修
-        function loadRepairs() {
-            const userId = currentUser?.id || 1;
-            fetch(`${API_BASE}/campus/repairs?userId=${userId}`)
-                .then(res => res.json())
-                .then(data => {
-                    const repairs = data.data || [];
-                    if (data.code === 0 && repairs.length > 0) {
-                        renderRepairs(repairs);
-                    } else {
-                        renderRepairsDemo();
+        // 报修数据 - 使用本地存储
+        let repairsData = [
+            { id: 1, title: '宿舍空调不制冷', category: '宿舍', description: '宿舍2号楼304室，空调不制冷，请尽快维修', location: '宿舍2号楼304', status: 'completed', created_at: '2026-06-07 10:30:00', repairman: '张师傅', repairTime: '2026-06-07 14:00' },
+            { id: 2, title: '教室灯具损坏', category: '教学设施', description: 'A栋教学楼102室，第3排灯不亮', location: 'A栋教学楼102', status: 'processing', created_at: '2026-06-06 15:20:00', repairman: '李师傅', repairTime: '2026-06-08 09:00' },
+            { id: 3, title: '水龙头漏水', category: '公共设施', description: '图书馆三楼卫生间，水龙头漏水', location: 'A区图书馆三楼', status: 'completed', created_at: '2026-06-05 09:00:00', repairman: '王师傅', repairTime: '2026-06-05 11:30' },
+            { id: 4, title: '门禁故障', category: '宿舍', description: '宿舍3号楼，大门门禁无法刷卡进入', location: '宿舍3号楼', status: 'submitted', created_at: '2026-06-04 18:30:00', repairman: null, repairTime: null },
+            { id: 5, title: '网络故障', category: '网络', description: '实验楼401室，无法连接校园网', location: '实验楼401', status: 'processing', created_at: '2026-06-03 11:00:00', repairman: '赵师傅', repairTime: '2026-06-04 10:00' }
+        ];
+        
+        // 加载报修数据
+        function loadRepairsFromStorage() {
+            const stored = localStorage.getItem('repairsData');
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        repairsData = parsed;
                     }
-                })
-                .catch(() => {
-                    renderRepairsDemo();
-                });
+                } catch (e) {
+                    console.error('解析报修数据失败:', e);
+                }
+            }
         }
         
-        // 演示报修
-        function renderRepairsDemo() {
-            const demoRepairs = [
-                { id: 1, title: '宿舍空调不制冷', type: '宿舍', description: '宿舍2号楼304室，空调不制冷，请尽快维修', location: '宿舍2号楼304', status: 'pending', created_at: '2026-06-07 10:30:00' },
-                { id: 2, title: '教室灯具损坏', type: '教学设施', description: 'A栋教学楼102室，第3排灯不亮', location: 'A栋教学楼102', status: 'in_progress', created_at: '2026-06-06 15:20:00' },
-                { id: 3, title: '水龙头漏水', type: '公共设施', description: '图书馆三楼卫生间，水龙头漏水', location: 'A区图书馆三楼', status: 'resolved', created_at: '2026-06-05 09:00:00' },
-                { id: 4, title: '门禁故障', type: '宿舍', description: '宿舍3号楼，大门门禁无法刷卡进入', location: '宿舍3号楼', status: 'pending', created_at: '2026-06-04 18:30:00' },
-                { id: 5, title: '网络故障', type: '网络', description: '实验楼401室，无法连接校园网', location: '实验楼401', status: 'in_progress', created_at: '2026-06-03 11:00:00' }
-            ];
-            renderRepairs(demoRepairs);
+        // 保存报修数据到本地存储
+        function saveRepairsToStorage() {
+            localStorage.setItem('repairsData', JSON.stringify(repairsData));
         }
-
+        
+        // 更新统计数据
+        function updateRepairStats() {
+            const completed = repairsData.filter(r => r.status === 'completed').length;
+            const processing = repairsData.filter(r => r.status === 'processing').length;
+            const pending = repairsData.filter(r => r.status === 'submitted').length;
+            
+            document.getElementById('repairCompleted').textContent = completed;
+            document.getElementById('repairProcessing').textContent = processing;
+            document.getElementById('repairPending').textContent = pending;
+        }
+        
+        // 加载报修
+        function loadRepairs() {
+            loadRepairsFromStorage();
+            updateRepairStats();
+            renderRepairs(repairsData);
+        }
+        
         // 渲染报修
         function renderRepairs(items) {
             const statusMap = { submitted: '待处理', processing: '处理中', completed: '已完成', rejected: '已拒绝' };
             const statusColor = { submitted: '#ff9800', processing: '#2196f3', completed: '#4caf50', rejected: '#f44336' };
             
+            if (items.length === 0) {
+                document.getElementById('repairContent').innerHTML = `
+                    <p style="text-align:center;color:#999;padding:40px;">暂无报修记录</p>
+                    <button onclick="showRepairForm()" style="padding:12px 24px;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px;margin-top:20px;">+ 提交报修</button>
+                `;
+                return;
+            }
+            
             let html = '';
             items.forEach(item => {
                 html += `
-                    <div class="list-item" style="background:#f5f5f5;padding:15px;border-radius:8px;margin-bottom:10px;">
-                        <div style="flex:1;">
-                            <h4 style="margin:0;font-size:14px;">${item.title}</h4>
-                            <p style="margin:5px 0 0;font-size:12px;color:#666;">${item.description}</p>
-                            <p style="margin:5px 0 0;font-size:11px;color:#999;">📍 ${item.location} | 分类：${item.category}</p>
+                    <div style="background:white;padding:20px;border-radius:8px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);border-left:4px solid ${statusColor[item.status]};">
+                        <div style="display:flex;justify-content:space-between;align-items:start;">
+                            <div style="flex:1;">
+                                <h4 style="margin:0 0 10px;font-size:16px;color:#333;">${item.title}</h4>
+                                <p style="margin:0 0 8px;font-size:13px;color:#666;">${item.description}</p>
+                                <p style="margin:0 0 8px;font-size:12px;color:#666;">📍 ${item.location} | 分类：${item.category}</p>
+                                <p style="margin:0;font-size:12px;color:#999;">📅 ${item.created_at}</p>
+                                ${item.repairman ? `<p style="margin:8px 0 0;font-size:12px;color:#2196f3;">🔧 维修员：${item.repairman} | 维修时间：${item.repairTime}</p>` : ''}
+                            </div>
+                            <span class="badge" style="background:${statusColor[item.status]};color:white;padding:6px 12px;border-radius:15px;font-size:12px;">${statusMap[item.status]}</span>
                         </div>
-                        <span class="badge" style="background:${statusColor[item.status]};color:white;">${statusMap[item.status]}</span>
                     </div>
                 `;
             });
-            document.getElementById('repairContent').innerHTML = (items.length ? html : '<p style="text-align:center;color:#999;">暂无报修记录</p>') + `
-                <button class="badge badge-info" style="margin-top:15px;padding:12px 24px;cursor:pointer;border:none;" onclick="showRepairForm()">提交报修</button>
+            
+            document.getElementById('repairContent').innerHTML = html + `
+                <button onclick="showRepairForm()" style="padding:12px 24px;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px;margin-top:20px;width:100%;">+ 提交报修</button>
             `;
         }
 
         // 显示报修表单
         function showRepairForm() {
+            document.getElementById('repairTitle').value = '';
+            document.getElementById('repairDesc').value = '';
+            document.getElementById('repairLocation').value = '';
+            document.getElementById('repairCategory').value = '电器';
             document.getElementById('repairFormModal').classList.remove('hidden');
         }
 
         // 提交报修
         function submitRepair() {
-            const userId = currentUser?.id || 1;
-            const title = document.getElementById('repairTitle').value;
-            const description = document.getElementById('repairDesc').value;
-            const location = document.getElementById('repairLocation').value;
+            const title = document.getElementById('repairTitle').value.trim();
+            const description = document.getElementById('repairDesc').value.trim();
+            const location = document.getElementById('repairLocation').value.trim();
             const category = document.getElementById('repairCategory').value;
             
             if (!title || !description) {
-                showToast('请填写完整信息', 'error');
+                showToast('请填写标题和详细描述', 'error');
                 return;
             }
             
-            fetch(`${API_BASE}/campus/repairs`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: parseInt(userId), title, description, location, category })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.code === 0) {
-                    showToast('提交成功！', 'success');
-                    document.getElementById('repairFormModal').classList.add('hidden');
-                    loadRepairs();
-                }
-            })
-            .catch(() => showToast('提交失败', 'error'));
+            if (!location) {
+                showToast('请填写报修地点', 'error');
+                return;
+            }
+            
+            const newRepair = {
+                id: Date.now(),
+                title: title,
+                category: category,
+                description: description,
+                location: location,
+                status: 'submitted',
+                created_at: new Date().toLocaleString('zh-CN'),
+                repairman: null,
+                repairTime: null
+            };
+            
+            repairsData.unshift(newRepair);
+            saveRepairsToStorage();
+            updateRepairStats();
+            renderRepairs(repairsData);
+            
+            document.getElementById('repairFormModal').classList.add('hidden');
+            showToast('报修提交成功！维修人员将尽快处理', 'success');
         }
 
         // 失物招领数据
@@ -6426,26 +6498,41 @@
         // 报修 - 加载修理员信息
         function loadRepairmen() {
             const repairmen = [
-                { id: 1, name: '王师傅', phone: '138****1234', specialty: '电器维修', workTime: '周一至周五 8:00-18:00', status: '在线' },
-                { id: 2, name: '李师傅', phone: '139****5678', specialty: '水管维修', workTime: '周一至周六 8:00-18:00', status: '在线' },
-                { id: 3, name: '张师傅', phone: '137****9012', specialty: '门窗维修', workTime: '周一至周五 9:00-17:00', status: '离线' },
-                { id: 4, name: '刘师傅', phone: '136****3456', specialty: '多媒体设备', workTime: '周一至周日 8:00-20:00', status: '在线' },
-                { id: 5, name: '陈师傅', phone: '135****7890', specialty: '综合维修', workTime: '周一至周六 8:00-18:00', status: '在线' }
+                { id: 1, name: '王师傅', phone: '138****1234', specialty: '电器维修', workTime: '周一至周五 8:00-18:00', status: '在线', completed: 128, rating: 4.9 },
+                { id: 2, name: '李师傅', phone: '139****5678', specialty: '水管维修', workTime: '周一至周六 8:00-18:00', status: '在线', completed: 96, rating: 4.8 },
+                { id: 3, name: '张师傅', phone: '137****9012', specialty: '门窗维修', workTime: '周一至周五 9:00-17:00', status: '离线', completed: 75, rating: 4.7 },
+                { id: 4, name: '刘师傅', phone: '136****3456', specialty: '多媒体设备', workTime: '周一至周日 8:00-20:00', status: '在线', completed: 156, rating: 4.9 },
+                { id: 5, name: '陈师傅', phone: '135****7890', specialty: '综合维修', workTime: '周一至周六 8:00-18:00', status: '在线', completed: 203, rating: 4.8 }
             ];
             
-            let html = `<table class="data-table"><thead><tr><th>姓名</th><th>联系电话</th><th>专业特长</th><th>工作时间</th><th>状态</th></tr></thead><tbody>`;
+            let html = '';
             repairmen.forEach(r => {
-                const statusClass = r.status === '在线' ? 'badge-success' : 'badge-secondary';
-                html += `<tr>
-                    <td>${r.name}</td>
-                    <td>${r.phone}</td>
-                    <td>${r.specialty}</td>
-                    <td>${r.workTime}</td>
-                    <td><span class="badge ${statusClass}">${r.status}</span></td>
-                </tr>`;
+                const statusColor = r.status === '在线' ? '#4caf50' : '#999';
+                html += `
+                    <div style="background:white;padding:20px;border-radius:8px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);display:flex;gap:20px;align-items:center;">
+                        <div style="width:80px;height:80px;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;color:white;font-weight:bold;flex-shrink:0;">
+                            ${r.name.charAt(0)}
+                        </div>
+                        <div style="flex:1;">
+                            <h4 style="margin:0 0 8px;font-size:16px;color:#333;">${r.name} <span style="padding:2px 8px;background:${statusColor};color:white;border-radius:10px;font-size:11px;margin-left:8px;">${r.status}</span></h4>
+                            <p style="margin:0 0 6px;font-size:13px;color:#666;">🔧 专业：${r.specialty} | 📞 ${r.phone}</p>
+                            <p style="margin:0;font-size:12px;color:#999;">⏰ 工作时间：${r.workTime}</p>
+                        </div>
+                        <div style="text-align:center;padding:15px;background:#f5f5f5;border-radius:8px;min-width:120px;">
+                            <div style="font-size:24px;font-weight:bold;color:#667eea;">${r.completed}</div>
+                            <div style="font-size:12px;color:#666;">已完成</div>
+                            <div style="font-size:14px;color:#ff9800;margin-top:5px;">⭐ ${r.rating}</div>
+                        </div>
+                    </div>
+                `;
             });
-            html += '</tbody></table>';
             document.getElementById('repairmanList').innerHTML = html;
+        }
+        
+        // 显示维修员信息
+        function showRepairmanInfo() {
+            loadRepairmen();
+            document.querySelector('#pageRepair .card:last-child').scrollIntoView({ behavior: 'smooth' });
         }
 
         // 作业练习 - AI生成作业
@@ -6546,18 +6633,22 @@
 
         // 图书馆 - 图书数据
         const libraryBooks = [
-            { id: 1, title: '高等数学（第七版）', author: '同济大学', isbn: '978-7-04-039663-8', location: 'A区-3层-001', status: 'available', category: '数学', publisher: '高等教育出版社', publishYear: '2020', pages: 416, summary: '本书是普通高等教育"十一五"国家级规划教材，内容包括函数与极限、导数与微分、微分中值定理与导数的应用等。' },
-            { id: 2, title: '线性代数（第五版）', author: '清华大学', isbn: '978-7-04-039585-6', location: 'A区-3层-002', status: 'available', category: '数学', publisher: '高等教育出版社', publishYear: '2021', pages: 216, summary: '本书是面向21世纪课程教材，内容包括行列式、矩阵及其运算、矩阵的初等变换等。' },
-            { id: 3, title: '概率论与数理统计', author: '浙江大学', isbn: '978-7-04-049112-4', location: 'A区-3层-003', status: 'borrowed', category: '数学', publisher: '高等教育出版社', publishYear: '2019', pages: 345, summary: '本书是普通高等教育"十二五"国家级规划教材，内容包括随机事件及其概率、随机变量及其分布等。' },
-            { id: 4, title: '数据结构（C语言版）', author: '严蔚敏', isbn: '978-7-04-006004-3', location: 'B区-2层-001', status: 'available', category: '计算机', publisher: '高等教育出版社', publishYear: '1997', pages: 334, summary: '本书是国内数据结构课程的经典教材，内容包括线性表、栈和队列、树和二叉树等。' },
-            { id: 5, title: '计算机网络（第七版）', author: '谢希仁', isbn: '978-7-115-45388-3', location: 'B区-2层-002', status: 'available', category: '计算机', publisher: '人民邮电出版社', publishYear: '2017', pages: 452, summary: '本书是国内计算机网络课程的权威教材，内容包括物理层、数据链路层、网络层等。' },
-            { id: 6, title: '操作系统（第四版）', author: '汤小丹', isbn: '978-7-111-26534-7', location: 'B区-2层-003', status: 'borrowed', category: '计算机', publisher: '机械工业出版社', publishYear: '2014', pages: 416, summary: '本书是高等院校计算机专业操作系统课程的经典教材。' },
-            { id: 7, title: '大学英语精读（第一册）', author: '董亚芬', isbn: '978-7-5446-4834-6', location: 'C区-1层-001', status: 'available', category: '外语', publisher: '上海外语教育出版社', publishYear: '2017', pages: 212, summary: '本书是大学英语精读教材，注重培养学生的英语语言能力和综合应用能力。' },
-            { id: 8, title: '新概念英语（第三册）', author: '亚历山大', isbn: '978-7-5600-1347-2', location: 'C区-1层-002', status: 'available', category: '外语', publisher: '外语教学与研究出版社', publishYear: '1997', pages: 273, summary: '本书是经典的英语学习教材，适合中级英语学习者。' },
-            { id: 9, title: '物理学（第七版）', author: '马文蔚', isbn: '978-7-04-042078-8', location: 'A区-4层-001', status: 'available', category: '物理', publisher: '高等教育出版社', publishYear: '2016', pages: 372, summary: '本书是面向21世纪课程教材，内容包括力学、热学、电磁学等。' },
-            { id: 10, title: '现代汉语（第七版）', author: '黄伯荣', isbn: '978-7-04-046593-4', location: 'D区-1层-001', status: 'borrowed', category: '文学', publisher: '高等教育出版社', publishYear: '2016', pages: 384, summary: '本书是现代汉语课程的经典教材，内容包括语音、文字、词汇、语法等。' },
-            { id: 11, title: '管理学原理', author: '周三多', isbn: '978-7-04-049385-2', location: 'D区-2层-001', status: 'available', category: '管理', publisher: '高等教育出版社', publishYear: '2018', pages: 367, summary: '本书是管理学入门教材，内容包括管理的基本原理和方法。' },
-            { id: 12, title: '经济学原理', author: '曼昆', isbn: '978-7-301-25690-5', location: 'D区-2层-002', status: 'available', category: '经济', publisher: '北京大学出版社', publishYear: '2015', pages: 540, summary: '本书是经济学入门教材，内容包括微观经济学和宏观经济学基础。' }
+            { id: 1, title: '高等数学（第七版）', author: '同济大学', isbn: '978-7-04-039663-8', location: 'A区-3层-001', status: 'available', category: '数学', publisher: '高等教育出版社', publishYear: '2020', pages: 416, summary: '本书是普通高等教育"十一五"国家级规划教材，内容包括函数与极限、导数与微分、微分中值定理与导数的应用等。', image: 'https://img.bookset.me/201806/9787040132668.jpg' },
+            { id: 2, title: '线性代数（第五版）', author: '清华大学', isbn: '978-7-04-039585-6', location: 'A区-3层-002', status: 'available', category: '数学', publisher: '高等教育出版社', publishYear: '2021', pages: 216, summary: '本书是面向21世纪课程教材，内容包括行列式、矩阵及其运算、矩阵的初等变换等。', image: 'https://img.bookset.me/201806/9787302304818.jpg' },
+            { id: 3, title: '概率论与数理统计', author: '浙江大学', isbn: '978-7-04-049112-4', location: 'A区-3层-003', status: 'borrowed', category: '数学', publisher: '高等教育出版社', publishYear: '2019', pages: 345, summary: '本书是普通高等教育"十二五"国家级规划教材，内容包括随机事件及其概率、随机变量及其分布等。', image: 'https://img.bookset.me/201806/9787040491121.jpg' },
+            { id: 4, title: '数据结构（C语言版）', author: '严蔚敏', isbn: '978-7-04-006004-3', location: 'B区-2层-001', status: 'available', category: '计算机', publisher: '高等教育出版社', publishYear: '1997', pages: 334, summary: '本书是国内数据结构课程的经典教材，内容包括线性表、栈和队列、树和二叉树等。', image: 'https://img.bookset.me/201806/9787302236317.jpg' },
+            { id: 5, title: '计算机网络（第七版）', author: '谢希仁', isbn: '978-7-115-45388-3', location: 'B区-2层-002', status: 'available', category: '计算机', publisher: '人民邮电出版社', publishYear: '2017', pages: 452, summary: '本书是国内计算机网络课程的权威教材，内容包括物理层、数据链路层、网络层等。', image: 'https://img.bookset.me/201806/9787121230681.jpg' },
+            { id: 6, title: '操作系统（第四版）', author: '汤小丹', isbn: '978-7-111-26534-7', location: 'B区-2层-003', status: 'borrowed', category: '计算机', publisher: '机械工业出版社', publishYear: '2014', pages: 416, summary: '本书是高等院校计算机专业操作系统课程的经典教材。', image: 'https://img.bookset.me/201806/9787560133706.jpg' },
+            { id: 7, title: '大学英语精读（第一册）', author: '董亚芬', isbn: '978-7-5446-4834-6', location: 'C区-1层-001', status: 'available', category: '外语', publisher: '上海外语教育出版社', publishYear: '2017', pages: 212, summary: '本书是大学英语精读教材，注重培养学生的英语语言能力和综合应用能力。', image: 'https://img.bookset.me/201806/9787544648346.jpg' },
+            { id: 8, title: '新概念英语（第三册）', author: '亚历山大', isbn: '978-7-5600-1347-2', location: 'C区-1层-002', status: 'available', category: '外语', publisher: '外语教学与研究出版社', publishYear: '1997', pages: 273, summary: '本书是经典的英语学习教材，适合中级英语学习者。', image: 'https://img.bookset.me/201806/9787560013472.jpg' },
+            { id: 9, title: '物理学（第七版）', author: '马文蔚', isbn: '978-7-04-042078-8', location: 'A区-4层-001', status: 'available', category: '物理', publisher: '高等教育出版社', publishYear: '2016', pages: 372, summary: '本书是面向21世纪课程教材，内容包括力学、热学、电磁学等。', image: 'https://img.bookset.me/201806/9787040211040.jpg' },
+            { id: 10, title: '现代汉语（第七版）', author: '黄伯荣', isbn: '978-7-04-046593-4', location: 'D区-1层-001', status: 'borrowed', category: '文学', publisher: '高等教育出版社', publishYear: '2016', pages: 384, summary: '本书是现代汉语课程的经典教材，内容包括语音、文字、词汇、语法等。', image: 'https://img.bookset.me/201806/9787040465934.jpg' },
+            { id: 11, title: '管理学原理', author: '周三多', isbn: '978-7-04-049385-2', location: 'D区-2层-001', status: 'available', category: '管理', publisher: '高等教育出版社', publishYear: '2018', pages: 367, summary: '本书是管理学入门教材，内容包括管理的基本原理和方法。', image: 'https://img.bookset.me/201806/9787040493852.jpg' },
+            { id: 12, title: '经济学原理', author: '曼昆', isbn: '978-7-301-25690-5', location: 'D区-2层-002', status: 'available', category: '经济', publisher: '北京大学出版社', publishYear: '2015', pages: 540, summary: '本书是经济学入门教材，内容包括微观经济学和宏观经济学基础。', image: 'https://img.bookset.me/201806/9787301256905.jpg' },
+            { id: 13, title: '红楼梦', author: '曹雪芹', isbn: '978-7-02-000220-0', location: 'E区-1层-001', status: 'available', category: '文学', publisher: '人民文学出版社', publishYear: '2008', pages: 1224, summary: '中国古典四大名著之一，清代作家曹雪芹创作的长篇小说。', image: 'https://img.bookset.me/201806/9787020002200.jpg' },
+            { id: 14, title: '三体', author: '刘慈欣', isbn: '978-7-5366-9293-0', location: 'E区-1层-002', status: 'available', category: '文学', publisher: '重庆出版社', publishYear: '2008', pages: 512, summary: '科幻小说的里程碑之作，讲述人类文明与三体文明的史诗级碰撞。', image: 'https://img.bookset.me/201806/9787536692930.jpg' },
+            { id: 15, title: '算法导论', author: 'Thomas H.Cormen', isbn: '978-7-111-40701-0', location: 'B区-2层-004', status: 'borrowed', category: '计算机', publisher: '机械工业出版社', publishYear: '2012', pages: 1280, summary: '算法领域的经典巨著，全面介绍了各种算法的设计和分析方法。', image: 'https://img.bookset.me/201806/9787111407010.jpg' },
+            { id: 16, title: '深度学习', author: 'Ian Goodfellow', isbn: '978-7-115-42802-6', location: 'B区-2层-005', status: 'available', category: '计算机', publisher: '人民邮电出版社', publishYear: '2017', pages: 520, summary: '深度学习领域的权威教材，由深度学习先驱Ian Goodfellow等人撰写。', image: 'https://img.bookset.me/201806/9787115428026.jpg' }
         ];
         
         // 我的借阅数据
@@ -6575,85 +6666,196 @@
             { id: 7, title: '大学英语精读（第一册）', author: '董亚芬', borrowDate: '2026-01-20', returnDate: '2026-03-20', status: '已归还' }
         ];
         
-        // 加载图书列表
-        function loadLibraryBooks() {
-            const searchKey = document.getElementById('librarySearch').value.toLowerCase();
-            const filteredBooks = libraryBooks.filter(book => 
-                book.title.toLowerCase().includes(searchKey) || 
-                book.author.toLowerCase().includes(searchKey) ||
-                book.isbn.includes(searchKey)
-            );
+        // 我的预约数据
+        let myReservedBooks = [];
+        
+        // 分类筛选图书
+        function filterBooks() {
+            const keyword = document.getElementById('librarySearch').value.toLowerCase();
+            const category = document.getElementById('bookCategory').value;
             
-            let html = '';
-            filteredBooks.forEach(book => {
-                const statusText = book.status === 'available' ? '可借阅' : '已借出';
-                const statusClass = book.status === 'available' ? 'badge-success' : 'badge-warning';
-                html += `<tr>
-                    <td>${book.title}</td>
-                    <td>${book.author}</td>
-                    <td>${book.isbn}</td>
-                    <td>${book.location}</td>
-                    <td><span class="badge ${statusClass}">${statusText}</span></td>
-                    <td>
-                        <button onclick="showBookDetail(${book.id})" style="padding: 4px 12px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;">详情</button>
-                        ${book.status === 'available' ? '<button onclick="borrowBook(' + book.id + ')" style="padding: 4px 12px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer;">借阅</button>' : '-'}
-                    </td>
-                </tr>`;
-            });
-            document.getElementById('libraryTable').innerHTML = html;
+            let filteredBooks = libraryBooks;
+            
+            if (category !== 'all') {
+                filteredBooks = filteredBooks.filter(book => book.category === category);
+            }
+            
+            if (keyword) {
+                filteredBooks = filteredBooks.filter(book => 
+                    book.title.toLowerCase().includes(keyword) || 
+                    book.author.toLowerCase().includes(keyword) ||
+                    book.isbn.includes(keyword)
+                );
+            }
+            
+            renderBooksGrid(filteredBooks);
         }
         
-        // 搜索图书
-        function searchLibrary() {
-            loadLibraryBooks();
+        // 渲染图书网格
+        function renderBooksGrid(books) {
+            const container = document.getElementById('booksGrid');
+            
+            if (books.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">未找到匹配的图书</p>';
+                return;
+            }
+            
+            let html = '';
+            books.forEach(book => {
+                const isReserved = myReservedBooks.find(r => r.id === book.id);
+                const statusText = book.status === 'available' ? '可借阅' : '已借出';
+                const statusClass = book.status === 'available' ? 'badge-success' : 'badge-warning';
+                
+                html += `
+                    <div style="background:white;padding:15px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);cursor:pointer;transition:transform 0.2s;" onclick="showBookDetail(${book.id})">
+                        <div style="height:180px;background:#f5f5f5;border-radius:8px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                            <img src="${book.image}" alt="${book.title}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='📖'">
+                        </div>
+                        <h4 style="margin:0 0 8px;font-size:15px;color:#333;">${book.title}</h4>
+                        <p style="margin:0 0 5px;font-size:12px;color:#666;">作者：${book.author}</p>
+                        <p style="margin:0 0 5px;font-size:12px;color:#666;">分类：${book.category}</p>
+                        <p style="margin:0 0 10px;font-size:12px;color:#666;">馆藏位置：${book.location}</p>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span class="badge ${statusClass}">${statusText}</span>
+                            ${isReserved ? 
+                                '<span style="color:#e91e63;font-size:12px;">已预约</span>' :
+                                book.status === 'available' ?
+                                '<button onclick="event.stopPropagation(); borrowBook(' + book.id + ')" style="padding:6px 16px;background:#667eea;color:white;border:none;border-radius:15px;cursor:pointer;font-size:12px;">借阅</button>' :
+                                '<button onclick="event.stopPropagation(); reserveBook(' + book.id + ')" style="padding:6px 16px;background:#e91e63;color:white;border:none;border-radius:15px;cursor:pointer;font-size:12px;">预约</button>'
+                            }
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
         }
         
         // 显示图书馆标签页
         function showLibraryTab(tab) {
+            document.getElementById('librarySearchContent').style.display = 'none';
+            document.getElementById('libraryBorrowedContent').style.display = 'none';
+            document.getElementById('libraryReservedContent').style.display = 'none';
+            document.getElementById('libraryHistoryContent').style.display = 'none';
+            
             if (tab === 'search') {
-                document.getElementById('libraryContent').innerHTML = `
-                    <div id="librarySearchContent">
-                        <table class="data-table">
-                            <thead><tr><th>书名</th><th>作者</th><th>ISBN</th><th>馆藏位置</th><th>状态</th><th>操作</th></tr></thead>
-                            <tbody id="libraryTable">
-                            </tbody>
-                        </table>
+                document.getElementById('librarySearchContent').style.display = 'block';
+                filterBooks();
+            } else if (tab === 'borrowed') {
+                document.getElementById('libraryBorrowedContent').style.display = 'block';
+                renderBorrowedBooks();
+            } else if (tab === 'reserved') {
+                document.getElementById('libraryReservedContent').style.display = 'block';
+                renderReservedBooks();
+            } else if (tab === 'history') {
+                document.getElementById('libraryHistoryContent').style.display = 'block';
+                renderBorrowHistory();
+            }
+        }
+        
+        // 渲染我的借阅
+        function renderBorrowedBooks() {
+            const container = document.getElementById('borrowedBooksList');
+            
+            if (myBorrowedBooks.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">您还没有借阅任何图书</p>';
+                return;
+            }
+            
+            let html = '';
+            const today = new Date();
+            
+            myBorrowedBooks.forEach(book => {
+                const isOverdue = new Date(book.dueDate) < today;
+                const dueClass = isOverdue ? 'badge-danger' : 'badge-warning';
+                
+                html += `
+                    <div style="background:white;padding:20px;border-radius:8px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);border-left:4px solid ${isOverdue ? '#f44336' : '#4caf50'};">
+                        <div style="display:flex;gap:20px;">
+                            <div style="width:100px;height:130px;background:#f5f5f5;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+                                <img src="${libraryBooks.find(b => b.id === book.id)?.image || ''}" alt="${book.title}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='📖'">
+                            </div>
+                            <div style="flex:1;">
+                                <h4 style="margin:0 0 8px;font-size:16px;color:#333;">${book.title}</h4>
+                                <p style="margin:0 0 6px;font-size:13px;color:#666;">作者：${book.author}</p>
+                                <p style="margin:0 0 6px;font-size:13px;color:#666;">借阅日期：${book.borrowDate}</p>
+                                <p style="margin:0 0 12px;font-size:13px;color:${isOverdue ? '#f44336' : '#666'};">
+                                    应还日期：<span class="badge ${dueClass}">${book.dueDate}</span>
+                                </p>
+                                <div style="display:flex;gap:10px;">
+                                    ${book.renewCount < 2 ? '<button onclick="renewBook(' + book.id + ')" style="padding:8px 20px;background:#ff9800;color:white;border:none;border-radius:20px;cursor:pointer;font-size:13px;">续借</button>' : ''}
+                                    <button onclick="returnBook(${book.id})" style="padding:8px 20px;background:#f44336;color:white;border:none;border-radius:20px;cursor:pointer;font-size:13px;">归还</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 `;
-                loadLibraryBooks();
-            } else if (tab === 'borrowed') {
-                let html = '<table class="data-table"><thead><tr><th>书名</th><th>作者</th><th>借阅日期</th><th>应还日期</th><th>续借次数</th><th>操作</th></tr></thead><tbody>';
-                myBorrowedBooks.forEach(book => {
-                    const isOverdue = new Date(book.dueDate) < new Date();
-                    const dueClass = isOverdue ? 'badge-danger' : 'badge-warning';
-                    html += `<tr>
-                        <td>${book.title}</td>
-                        <td>${book.author}</td>
-                        <td>${book.borrowDate}</td>
-                        <td><span class="badge ${dueClass}">${book.dueDate}</span></td>
-                        <td>${book.renewCount}/2</td>
-                        <td>
-                            ${book.renewCount < 2 ? '<button onclick="renewBook(' + book.id + ')" style="padding: 4px 12px; background: #ff9800; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;">续借</button>' : '-'}
-                            <button onclick="returnBook(' + book.id + ')" style="padding: 4px 12px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">归还</button>
-                        </td>
-                    </tr>`;
-                });
-                html += '</tbody></table>';
-                document.getElementById('libraryContent').innerHTML = html;
-            } else if (tab === 'history') {
-                let html = '<table class="data-table"><thead><tr><th>书名</th><th>作者</th><th>借阅日期</th><th>归还日期</th><th>状态</th></tr></thead><tbody>';
-                borrowHistory.forEach(book => {
-                    html += `<tr>
-                        <td>${book.title}</td>
-                        <td>${book.author}</td>
-                        <td>${book.borrowDate}</td>
-                        <td>${book.returnDate}</td>
-                        <td><span class="badge badge-success">${book.status}</span></td>
-                    </tr>`;
-                });
-                html += '</tbody></table>';
-                document.getElementById('libraryContent').innerHTML = html;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // 渲染我的预约
+        function renderReservedBooks() {
+            const container = document.getElementById('reservedBooksList');
+            
+            if (myReservedBooks.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">您还没有预约任何图书</p>';
+                return;
             }
+            
+            let html = '';
+            myReservedBooks.forEach(book => {
+                html += `
+                    <div style="background:white;padding:20px;border-radius:8px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);border-left:4px solid #e91e63;">
+                        <div style="display:flex;gap:20px;">
+                            <div style="width:100px;height:130px;background:#f5f5f5;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+                                <img src="${book.image}" alt="${book.title}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='📖'">
+                            </div>
+                            <div style="flex:1;">
+                                <h4 style="margin:0 0 8px;font-size:16px;color:#333;">${book.title}</h4>
+                                <p style="margin:0 0 6px;font-size:13px;color:#666;">作者：${book.author}</p>
+                                <p style="margin:0 0 6px;font-size:13px;color:#666;">馆藏位置：${book.location}</p>
+                                <p style="margin:0 0 12px;font-size:13px;color:#e91e63;">预约日期：${book.reserveDate}</p>
+                                <button onclick="cancelReserve(${book.id})" style="padding:8px 20px;background:#f0f0f0;color:#333;border:none;border-radius:20px;cursor:pointer;font-size:13px;">取消预约</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // 渲染借阅历史
+        function renderBorrowHistory() {
+            const container = document.getElementById('historyBooksList');
+            
+            if (borrowHistory.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">暂无借阅历史</p>';
+                return;
+            }
+            
+            let html = '';
+            borrowHistory.slice().reverse().forEach(book => {
+                html += `
+                    <div style="background:white;padding:20px;border-radius:8px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);border-left:4px solid #667eea;">
+                        <div style="display:flex;gap:20px;">
+                            <div style="width:80px;height:100px;background:#f5f5f5;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+                                <img src="${libraryBooks.find(b => b.id === book.id)?.image || ''}" alt="${book.title}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='📖'">
+                            </div>
+                            <div style="flex:1;">
+                                <h4 style="margin:0 0 8px;font-size:15px;color:#333;">${book.title}</h4>
+                                <p style="margin:0 0 5px;font-size:12px;color:#666;">作者：${book.author}</p>
+                                <p style="margin:0 0 5px;font-size:12px;color:#666;">借阅日期：${book.borrowDate}</p>
+                                <p style="margin:0;font-size:12px;color:#4caf50;">归还日期：${book.returnDate}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
         }
         
         // 显示图书详情
@@ -6661,19 +6863,37 @@
             const book = libraryBooks.find(b => b.id === bookId);
             if (!book) return;
             
+            const isReserved = myReservedBooks.find(r => r.id === bookId);
+            const canBorrow = book.status === 'available' && !isReserved;
+            const canReserve = book.status === 'borrowed' && !isReserved;
+            
             document.getElementById('bookDetailContent').innerHTML = `
-                <h3 style="margin: 0 0 15px;">📖 ${book.title}</h3>
-                <p><strong>作者：</strong>${book.author}</p>
-                <p><strong>ISBN：</strong>${book.isbn}</p>
-                <p><strong>出版社：</strong>${book.publisher}</p>
-                <p><strong>出版年份：</strong>${book.publishYear}</p>
-                <p><strong>页数：</strong>${book.pages}页</p>
-                <p><strong>馆藏位置：</strong>${book.location}</p>
-                <p><strong>分类：</strong>${book.category}</p>
-                <p><strong>简介：</strong>${book.summary}</p>
-                <div style="margin-top: 15px;">
-                    ${book.status === 'available' ? '<button onclick="borrowBook(' + book.id + '); closeBookDetail();" style="padding: 8px 16px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer;">借阅此书</button>' : '<span class="badge badge-warning">已借出</span>'}
-                    <button onclick="closeBookDetail()" style="padding: 8px 16px; background: #ddd; color: #333; border: none; border-radius: 6px; cursor: pointer; margin-left: 10px;">关闭</button>
+                <div style="display:flex;gap:20px;">
+                    <div style="width:150px;height:200px;background:#f5f5f5;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+                        <img src="${book.image}" alt="${book.title}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='📖'">
+                    </div>
+                    <div style="flex:1;">
+                        <h3 style="margin:0 0 10px;font-size:18px;color:#333;">📖 ${book.title}</h3>
+                        <p style="margin:0 0 8px;font-size:13px;color:#666;"><strong>作者：</strong>${book.author}</p>
+                        <p style="margin:0 0 8px;font-size:13px;color:#666;"><strong>ISBN：</strong>${book.isbn}</p>
+                        <p style="margin:0 0 8px;font-size:13px;color:#666;"><strong>出版社：</strong>${book.publisher}</p>
+                        <p style="margin:0 0 8px;font-size:13px;color:#666;"><strong>出版年份：</strong>${book.publishYear}</p>
+                        <p style="margin:0 0 8px;font-size:13px;color:#666;"><strong>页数：</strong>${book.pages}页</p>
+                        <p style="margin:0 0 8px;font-size:13px;color:#666;"><strong>馆藏位置：</strong>${book.location}</p>
+                        <p style="margin:0 0 8px;font-size:13px;color:#666;"><strong>分类：</strong>${book.category}</p>
+                        <p style="margin:0 0 15px;font-size:13px;color:#666;line-height:1.6;"><strong>简介：</strong>${book.summary}</p>
+                        <div style="display:flex;gap:10px;">
+                            ${isReserved ? 
+                                '<span style="padding:8px 16px;background:#e91e63;color:white;border-radius:20px;font-size:13px;">已预约</span>' :
+                                canBorrow ?
+                                '<button onclick="borrowBook(' + book.id + '); closeBookDetail();" style="padding:8px 20px;background:#667eea;color:white;border:none;border-radius:20px;cursor:pointer;font-size:13px;">借阅图书</button>' :
+                                canReserve ?
+                                '<button onclick="reserveBook(' + book.id + '); closeBookDetail();" style="padding:8px 20px;background:#e91e63;color:white;border:none;border-radius:20px;cursor:pointer;font-size:13px;">预约图书</button>' :
+                                '<span style="padding:8px 16px;background:#ccc;color:#666;border-radius:20px;font-size:13px;">已借出</span>'
+                            }
+                            <button onclick="closeBookDetail()" style="padding:8px 20px;background:#f0f0f0;color:#333;border:none;border-radius:20px;cursor:pointer;font-size:13px;">关闭</button>
+                        </div>
+                    </div>
                 </div>
             `;
             document.getElementById('bookDetailModal').classList.remove('hidden');
@@ -6691,9 +6911,70 @@
                 showToast('该图书不可借阅', 'error');
                 return;
             }
+            
+            const reservedIndex = myReservedBooks.findIndex(r => r.id === bookId);
+            if (reservedIndex > -1) {
+                myReservedBooks.splice(reservedIndex, 1);
+            }
+            
             book.status = 'borrowed';
-            showToast('借阅成功！', 'success');
-            loadLibraryBooks();
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + 30);
+            
+            myBorrowedBooks.push({
+                id: book.id,
+                title: book.title,
+                author: book.author,
+                borrowDate: new Date().toISOString().split('T')[0],
+                dueDate: dueDate.toISOString().split('T')[0],
+                renewCount: 0
+            });
+            
+            showToast(`借阅成功！应还日期：${dueDate.toLocaleDateString()}`, 'success');
+            showLibraryTab('search');
+        }
+        
+        // 预约图书
+        function reserveBook(bookId) {
+            const book = libraryBooks.find(b => b.id === bookId);
+            if (!book) return;
+            
+            if (book.status === 'available') {
+                showToast('该图书可直接借阅，无需预约', 'warning');
+                return;
+            }
+            
+            if (myReservedBooks.find(r => r.id === bookId)) {
+                showToast('您已经预约了这本书', 'error');
+                return;
+            }
+            
+            if (myBorrowedBooks.find(b => b.id === bookId)) {
+                showToast('您已经借阅了这本书', 'error');
+                return;
+            }
+            
+            myReservedBooks.push({
+                ...book,
+                reserveDate: new Date().toISOString().split('T')[0]
+            });
+            
+            showToast('预约成功！当图书可借时将通知您', 'success');
+            showLibraryTab('search');
+        }
+        
+        // 取消预约
+        function cancelReserve(bookId) {
+            const book = libraryBooks.find(b => b.id === bookId);
+            if (!confirm(`确定要取消《${book.title}》的预约吗？`)) return;
+            
+            const index = myReservedBooks.findIndex(r => r.id === bookId);
+            if (index > -1) {
+                myReservedBooks.splice(index, 1);
+            }
+            
+            showToast('已取消预约', 'success');
+            showLibraryTab('reserved');
         }
         
         // 续借图书
@@ -6707,7 +6988,7 @@
             const newDueDate = new Date(book.dueDate);
             newDueDate.setDate(newDueDate.getDate() + 30);
             book.dueDate = newDueDate.toISOString().split('T')[0];
-            showToast('续借成功！', 'success');
+            showToast(`续借成功！新应还日期：${newDueDate.toLocaleDateString()}`, 'success');
             showLibraryTab('borrowed');
         }
         
@@ -6717,6 +6998,18 @@
             if (book) {
                 book.status = 'available';
             }
+            
+            const index = myBorrowedBooks.findIndex(b => b.id === bookId);
+            if (index > -1) {
+                const returnedBook = myBorrowedBooks[index];
+                borrowHistory.push({
+                    ...returnedBook,
+                    returnDate: new Date().toISOString().split('T')[0],
+                    status: '已归还'
+                });
+                myBorrowedBooks.splice(index, 1);
+            }
+            
             showToast('归还成功！', 'success');
             showLibraryTab('borrowed');
         }
@@ -6729,7 +7022,7 @@
             loadAttendanceRecords();
             loadCanteenMenu();
             loadRepairmen();
-            loadLibraryBooks();
+            filterBooks();
         });
     </script>
 </body>
