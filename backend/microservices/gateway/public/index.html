@@ -1033,8 +1033,12 @@
                         <span class="card-title">📋 作业管理</span>
                         <button onclick="showPublishHomework()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">+ 发布作业</button>
                     </div>
+                    <div style="margin-bottom: 20px;">
+                        <button onclick="loadHomework('all')" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">📋 全部作业</button>
+                        <button onclick="loadHomework('mine')" style="padding: 8px 16px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer;">👤 我的发布</button>
+                    </div>
                     <table class="data-table">
-                        <thead><tr><th>作业标题</th><th>所属课程</th><th>发布时间</th><th>截止时间</th><th>提交数</th><th>状态</th><th>操作</th></tr></thead>
+                        <thead><tr><th>作业标题</th><th>所属课程</th><th>发布人</th><th>发布时间</th><th>截止时间</th><th>提交数</th><th>状态</th><th>操作</th></tr></thead>
                         <tbody id="homeworkTable">
                         </tbody>
                     </table>
@@ -1092,6 +1096,12 @@
                             </select>
                             <input type="date" id="attendanceDate" style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px;" onchange="loadAttendance()">
                         </div>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <button onclick="loadAttendanceRecords('all')" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">📋 全部考勤</button>
+                        <button onclick="loadAttendanceRecords('mine')" style="padding: 8px 16px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer;">👤 我的发布</button>
+                    </div>
+                    <div id="attendanceRecordsTable" style="margin-bottom: 20px;">
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
                         <div style="padding: 20px; background: #e8f5e9; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #4caf50;" id="attendanceRate">95%</p><p style="color: #666;">出勤率</p></div>
@@ -5843,26 +5853,32 @@
         }
 
         // 作业管理 - 加载作业列表
-        function loadHomework() {
+        function loadHomework(filter = 'all') {
             const homeworkData = [
-                { id: 1, title: '第三章课后习题', course: '高等数学A', publishTime: '2026-06-01', deadline: '2026-06-10', submitted: 85, total: 120, status: '进行中' },
-                { id: 2, title: '矩阵运算练习', course: '线性代数', publishTime: '2026-05-28', deadline: '2026-06-05', submitted: 90, total: 95, status: '进行中' },
-                { id: 3, title: '函数求导综合练习', course: '高等数学A', publishTime: '2026-05-20', deadline: '2026-05-28', submitted: 118, total: 120, status: '已结束' },
-                { id: 4, title: '向量空间习题', course: '线性代数', publishTime: '2026-05-15', deadline: '2026-05-22', submitted: 93, total: 95, status: '已结束' },
-                { id: 5, title: '不定积分练习', course: '高等数学A', publishTime: '2026-06-08', deadline: '2026-06-15', submitted: 45, total: 120, status: '进行中' }
+                { id: 1, title: '第三章课后习题', course: '高等数学A', publisher: '王教授', publishTime: '2026-06-01', deadline: '2026-06-10', submitted: 85, total: 120, status: '进行中', isMine: true },
+                { id: 2, title: '矩阵运算练习', course: '线性代数', publisher: '张教授', publishTime: '2026-05-28', deadline: '2026-06-05', submitted: 90, total: 95, status: '进行中', isMine: true },
+                { id: 3, title: '函数求导综合练习', course: '高等数学A', publisher: '李老师', publishTime: '2026-05-20', deadline: '2026-05-28', submitted: 118, total: 120, status: '已结束', isMine: false },
+                { id: 4, title: '向量空间习题', course: '线性代数', publisher: '王教授', publishTime: '2026-05-15', deadline: '2026-05-22', submitted: 93, total: 95, status: '已结束', isMine: true },
+                { id: 5, title: '不定积分练习', course: '高等数学A', publisher: '王教授', publishTime: '2026-06-08', deadline: '2026-06-15', submitted: 45, total: 120, status: '进行中', isMine: true },
+                { id: 6, title: '级数收敛性判断', course: '高等数学A', publisher: '刘老师', publishTime: '2026-06-05', deadline: '2026-06-12', submitted: 78, total: 115, status: '进行中', isMine: false },
+                { id: 7, title: '特征值与特征向量', course: '线性代数', publisher: '陈老师', publishTime: '2026-06-03', deadline: '2026-06-10', submitted: 65, total: 95, status: '进行中', isMine: false },
+                { id: 8, title: '物理实验报告', course: '大学物理', publisher: '王教授', publishTime: '2026-06-06', deadline: '2026-06-18', submitted: 32, total: 88, status: '进行中', isMine: true }
             ];
             
+            const filteredData = filter === 'mine' ? homeworkData.filter(hw => hw.isMine) : homeworkData;
+            
             let html = '';
-            homeworkData.forEach(hw => {
+            filteredData.forEach(hw => {
                 const statusClass = hw.status === '进行中' ? 'badge-success' : 'badge-secondary';
                 html += `<tr>
                     <td>${hw.title}</td>
                     <td>${hw.course}</td>
+                    <td>${hw.publisher}</td>
                     <td>${hw.publishTime}</td>
                     <td>${hw.deadline}</td>
                     <td>${hw.submitted}/${hw.total}</td>
                     <td><span class="badge ${statusClass}">${hw.status}</span></td>
-                    <td>${hw.status === '进行中' ? '<button onclick="endHomework(' + hw.id + ')" style="padding: 3px 8px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">结束</button>' : '-'}</td>
+                    <td>${hw.isMine ? (hw.status === '进行中' ? '<button onclick="endHomework(' + hw.id + ')" style="padding: 3px 8px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">结束</button>' : '-') : '-'}</td>
                 </tr>`;
             });
             document.getElementById('homeworkTable').innerHTML = html;
@@ -5894,6 +5910,44 @@
             showToast('作业发布成功', 'success');
             closePublishHomework();
             loadHomework();
+        }
+
+        // 考勤管理 - 加载考勤记录列表
+        function loadAttendanceRecords(filter = 'all') {
+            const attendanceRecords = [
+                { id: 1, course: '高等数学A', date: '2026-06-10', timeSlot: '08:00-09:40', status: '已结束', publisher: '王教授', attendance: 115, leave: 3, absent: 2, isMine: true },
+                { id: 2, course: '线性代数', date: '2026-06-10', timeSlot: '14:00-15:40', status: '进行中', publisher: '张教授', attendance: 45, leave: 2, absent: 0, isMine: true },
+                { id: 3, course: '高等数学A', date: '2026-06-08', timeSlot: '08:00-09:40', status: '已结束', publisher: '王教授', attendance: 112, leave: 4, absent: 4, isMine: true },
+                { id: 4, course: '大学物理', date: '2026-06-09', timeSlot: '10:00-11:40', status: '已结束', publisher: '刘老师', attendance: 78, leave: 5, absent: 5, isMine: false },
+                { id: 5, course: '线性代数', date: '2026-06-07', timeSlot: '08:00-09:40', status: '已结束', publisher: '王教授', attendance: 90, leave: 3, absent: 2, isMine: true },
+                { id: 6, course: '大学英语', date: '2026-06-10', timeSlot: '16:00-17:40', status: '进行中', publisher: '李老师', attendance: 32, leave: 1, absent: 3, isMine: false },
+                { id: 7, course: '大学物理', date: '2026-06-10', timeSlot: '08:00-09:40', status: '已结束', publisher: '王教授', attendance: 82, leave: 4, absent: 2, isMine: true },
+                { id: 8, course: '大学英语', date: '2026-06-08', timeSlot: '10:00-11:40', status: '已结束', publisher: '陈老师', attendance: 85, leave: 2, absent: 8, isMine: false }
+            ];
+            
+            const filteredData = filter === 'mine' ? attendanceRecords.filter(record => record.isMine) : attendanceRecords;
+            
+            let html = '<table class="data-table"><thead><tr><th>课程</th><th>日期</th><th>时间段</th><th>出勤/请假/缺勤</th><th>发布人</th><th>状态</th><th>操作</th></tr></thead><tbody>';
+            filteredData.forEach(record => {
+                const statusClass = record.status === '进行中' ? 'badge-success' : 'badge-secondary';
+                html += `<tr>
+                    <td>${record.course}</td>
+                    <td>${record.date}</td>
+                    <td>${record.timeSlot}</td>
+                    <td>${record.attendance}/${record.leave}/${record.absent}</td>
+                    <td>${record.publisher}</td>
+                    <td><span class="badge ${statusClass}">${record.status}</span></td>
+                    <td>${record.isMine ? (record.status === '进行中' ? '<button onclick="endAttendanceRecord(' + record.id + ')" style="padding: 3px 8px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">结束</button>' : '-') : '-'}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById('attendanceRecordsTable').innerHTML = html;
+        }
+        
+        // 结束考勤记录
+        function endAttendanceRecord(id) {
+            showToast('考勤已结束', 'success');
+            loadAttendanceRecords();
         }
 
         // 考勤管理 - 加载考勤数据
@@ -6503,6 +6557,7 @@
             loadMyCourses();
             loadHomework();
             loadAttendance();
+            loadAttendanceRecords();
             loadCanteenMenu();
             loadRepairmen();
             loadLibraryBooks();
