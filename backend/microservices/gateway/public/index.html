@@ -1110,7 +1110,7 @@
                         <div style="padding: 20px; background: #ffebee; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #f44336;" id="absentCount">2</p><p style="color: #666;">缺勤人数</p></div>
                     </div>
                     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                        <button onclick="startAttendance()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">📝 开始考勤</button>
+                        <button onclick="showStartAttendanceModal()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">📝 开始考勤</button>
                         <button onclick="endAttendance()" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 6px; cursor: pointer;">⏹️ 结束考勤</button>
                         <button onclick="showKeyStudents()" style="padding: 10px 20px; background: #ff9800; color: white; border: none; border-radius: 6px; cursor: pointer;">⚠️ 重点人员</button>
                     </div>
@@ -1119,6 +1119,43 @@
                         <tbody id="attendanceTable">
                         </tbody>
                     </table>
+                </div>
+            </div>
+            
+            <!-- 开始考勤模态框 -->
+            <div id="startAttendanceModal" class="modal hidden">
+                <div class="modal-content" style="width: 500px;">
+                    <div class="modal-header">
+                        <span class="modal-title">📝 开始考勤</span>
+                        <div class="modal-close" onclick="closeStartAttendance()">×</div>
+                    </div>
+                    <div style="padding: 20px;">
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px;">科目分类</label>
+                            <select id="attendanceCourseSelect" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                                <option value="math">高等数学A</option>
+                                <option value="linear">线性代数</option>
+                                <option value="physics">大学物理</option>
+                                <option value="english">大学英语</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px;">日期</label>
+                            <input type="date" id="attendanceStartDate" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px;">开始时间</label>
+                            <input type="time" id="attendanceStartTime" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px;">结束时间</label>
+                            <input type="time" id="attendanceEndTime" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        </div>
+                        <div style="text-align: right;">
+                            <button onclick="closeStartAttendance()" style="padding: 8px 16px; background: #ddd; color: #333; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">取消</button>
+                            <button onclick="confirmStartAttendance()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">开始考勤</button>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -5935,15 +5972,16 @@
             
             const now = new Date();
             const publishTime = now.toISOString().split('T')[0];
-            const deadlineDate = deadline.replace('T', ' ');
             
             const newHomework = {
                 id: homeworkData.length + 1,
                 title: title,
                 course: course,
+                content: content,
                 publisher: '王教授',
                 publishTime: publishTime,
                 deadline: deadline.split('T')[0],
+                deadlineTime: deadline.split('T')[1] || '23:59',
                 submitted: 0,
                 total: course === '高等数学A' ? 120 : (course === '线性代数' ? 95 : (course === '大学物理' ? 88 : 90)),
                 status: '进行中',
@@ -5956,6 +5994,7 @@
             closePublishHomework();
             
             document.getElementById('homeworkTitle').value = '';
+            document.getElementById('homeworkCourse').value = '高等数学A';
             document.getElementById('homeworkContent').value = '';
             document.getElementById('homeworkDeadline').value = '';
             
@@ -6158,23 +6197,46 @@
             document.getElementById('attendanceTable').innerHTML = html;
         }
 
-        // 开始考勤
-        function startAttendance() {
-            const course = document.getElementById('attendanceCourse').value;
-            const date = document.getElementById('attendanceDate').value || new Date().toISOString().split('T')[0];
+        // 显示开始考勤模态框
+        function showStartAttendanceModal() {
+            document.getElementById('attendanceStartDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('attendanceStartTime').value = new Date().toTimeString().slice(0, 5);
+            const endTime = new Date();
+            endTime.setMinutes(endTime.getMinutes() + 90);
+            document.getElementById('attendanceEndTime').value = endTime.toTimeString().slice(0, 5);
+            document.getElementById('startAttendanceModal').classList.remove('hidden');
+        }
+        
+        // 关闭开始考勤模态框
+        function closeStartAttendance() {
+            document.getElementById('startAttendanceModal').classList.add('hidden');
+        }
+        
+        // 确认开始考勤
+        function confirmStartAttendance() {
+            const course = document.getElementById('attendanceCourseSelect').value;
+            const date = document.getElementById('attendanceStartDate').value;
+            const startTime = document.getElementById('attendanceStartTime').value;
+            const endTime = document.getElementById('attendanceEndTime').value;
+            
+            if (!date) {
+                showToast('请选择日期', 'error');
+                return;
+            }
+            if (!startTime) {
+                showToast('请设置开始时间', 'error');
+                return;
+            }
+            if (!endTime) {
+                showToast('请设置结束时间', 'error');
+                return;
+            }
             
             const courseNames = {
                 math: '高等数学A',
                 linear: '线性代数',
                 physics: '大学物理',
                 english: '大学英语'
-            };
-            
-            const timeSlots = {
-                math: '08:00-09:40',
-                linear: '14:00-15:40',
-                physics: '10:00-11:40',
-                english: '16:00-17:40'
             };
             
             const totalStudents = {
@@ -6188,7 +6250,9 @@
                 id: attendanceRecordsData.length + 1,
                 course: courseNames[course],
                 date: date,
-                timeSlot: timeSlots[course],
+                startTime: startTime,
+                endTime: endTime,
+                timeSlot: startTime + ' - ' + endTime,
                 status: '进行中',
                 publisher: '王教授',
                 attendance: 0,
@@ -6200,7 +6264,12 @@
             attendanceRecordsData.unshift(newRecord);
             
             showToast('考勤已开始', 'success');
+            closeStartAttendance();
             loadAttendanceRecords();
+            
+            document.getElementById('attendanceCourse').value = course;
+            document.getElementById('attendanceDate').value = date;
+            loadAttendance();
         }
 
         // 结束考勤
