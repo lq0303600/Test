@@ -1,0 +1,19 @@
+{
+  "name": "campus-smart-platform",
+  "version": "1.0.0",
+  "description": "教师智慧校园系统 - Node.js Express 后端 + 纯HTML前端",
+  "main": "backend/app.js",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev",
+    "test": "cd backend && npm test"
+  },
+  "keywords": [
+    "campus",
+    "education",
+    "express",
+    "microservices"
+  ],
+  "author": "",
+  "license": "MIT"
+}
