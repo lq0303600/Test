@@ -232,6 +232,7 @@
                     <li><a href="#" data-page="homework"><span class="icon">📋</span><span>作业管理</span></a></li>
                     <li><a href="#" data-page="attendance"><span class="icon">✅</span><span>考勤管理</span></a></li>
                     <li><a href="#" data-page="exercise"><span class="icon">📝</span><span>作业练习</span></a></li>
+                    <li><a href="#" data-page="test-bank"><span class="icon">📚</span><span>期中测试题库</span></a></li>
                 </ul>
             </div>
             
@@ -914,6 +915,117 @@
                             <tr><td>计算机基础</td><td>期末考试</td><td>2026-07-07 09:00-11:00</td><td>D401</td><td>12</td><td><span class="badge badge-warning">未开始</span></td></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+            
+            <!-- 期中测试题库页 -->
+            <div id="pageTestBank" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">📚 期中测试题库</span>
+                        <div style="display:flex;gap:10px;">
+                            <button onclick="showTestBankTab('ai-generate')" style="padding:8px 16px;background:#667eea;color:white;border:none;border-radius:6px;cursor:pointer;">🤖 AI出题</button>
+                            <button onclick="showTestBankTab('manual')" style="padding:8px 16px;background:#4caf50;color:white;border:none;border-radius:6px;cursor:pointer;">✏️ 自主出题</button>
+                            <button onclick="showTestBankTab('history')" style="padding:8px 16px;background:#9c27b0;color:white;border:none;border-radius:6px;cursor:pointer;">📜 历史试卷</button>
+                        </div>
+                    </div>
+                    <div id="testBankContent">
+                        <!-- AI出题 -->
+                        <div id="tabAiGenerate">
+                            <div style="background:#f5f5f5;padding:20px;border-radius:8px;margin-bottom:20px;">
+                                <h4 style="margin:0 0 15px;">🤖 AI智能出题</h4>
+                                <div style="display:flex;gap:20px;flex-wrap:wrap;">
+                                    <div style="flex:1;min-width:200px;">
+                                        <label style="display:block;margin-bottom:8px;font-size:14px;">课程名称</label>
+                                        <select id="aiCourse" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;">
+                                            <option value="高等数学">高等数学</option>
+                                            <option value="线性代数">线性代数</option>
+                                            <option value="大学英语">大学英语</option>
+                                            <option value="计算机网络">计算机网络</option>
+                                            <option value="数据结构">数据结构</option>
+                                            <option value="操作系统">操作系统</option>
+                                        </select>
+                                    </div>
+                                    <div style="flex:1;min-width:200px;">
+                                        <label style="display:block;margin-bottom:8px;font-size:14px;">题目数量</label>
+                                        <select id="aiQuestionCount" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;">
+                                            <option value="5">5道题</option>
+                                            <option value="10">10道题</option>
+                                            <option value="15">15道题</option>
+                                            <option value="20">20道题</option>
+                                        </select>
+                                    </div>
+                                    <div style="flex:1;min-width:200px;">
+                                        <label style="display:block;margin-bottom:8px;font-size:14px;">题目类型</label>
+                                        <select id="aiQuestionType" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;">
+                                            <option value="mixed">混合题型</option>
+                                            <option value="choice">选择题</option>
+                                            <option value="fill">填空题</option>
+                                            <option value="judge">判断题</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button onclick="generateQuestions()" style="margin-top:20px;padding:12px 30px;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;border:none;border-radius:8px;cursor:pointer;font-size:15px;">生成试卷</button>
+                            </div>
+                            <div id="generatedQuestions">
+                                <p style="text-align:center;color:#999;padding:40px;">点击上方按钮生成试卷</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 自主出题 -->
+                        <div id="tabManual" class="hidden">
+                            <div style="background:#f5f5f5;padding:20px;border-radius:8px;margin-bottom:20px;">
+                                <h4 style="margin:0 0 15px;">✏️ 自主出题</h4>
+                                <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:15px;">
+                                    <div style="flex:1;min-width:200px;">
+                                        <label style="display:block;margin-bottom:8px;font-size:14px;">试卷标题</label>
+                                        <input type="text" id="manualTitle" placeholder="输入试卷标题" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;">
+                                    </div>
+                                    <div style="flex:1;min-width:200px;">
+                                        <label style="display:block;margin-bottom:8px;font-size:14px;">所属课程</label>
+                                        <select id="manualCourse" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;">
+                                            <option value="高等数学">高等数学</option>
+                                            <option value="线性代数">线性代数</option>
+                                            <option value="大学英语">大学英语</option>
+                                            <option value="计算机网络">计算机网络</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div style="margin-bottom:15px;">
+                                    <label style="display:block;margin-bottom:8px;font-size:14px;">题目类型</label>
+                                    <select id="manualQuestionType" style="padding:10px;border:1px solid #ddd;border-radius:6px;margin-right:10px;">
+                                        <option value="choice">选择题</option>
+                                        <option value="fill">填空题</option>
+                                        <option value="judge">判断题</option>
+                                        <option value="short">简答题</option>
+                                    </select>
+                                    <button onclick="addQuestion()" style="padding:8px 20px;background:#4caf50;color:white;border:none;border-radius:6px;cursor:pointer;">+ 添加题目</button>
+                                </div>
+                                <div id="questionList">
+                                </div>
+                                <button onclick="savePaper()" style="margin-top:20px;padding:12px 30px;background:#4caf50;color:white;border:none;border-radius:8px;cursor:pointer;font-size:15px;">保存试卷</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 历史试卷 -->
+                        <div id="tabHistory" class="hidden">
+                            <div id="historyPapers">
+                                <p style="text-align:center;color:#999;padding:40px;">暂无历史试卷</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 试卷预览模态框 -->
+                <div id="paperPreviewModal" class="modal hidden">
+                    <div class="modal-content" style="max-width:800px;max-height:80vh;overflow-y:auto;">
+                        <div class="modal-header">
+                            <span class="modal-title">📄 试卷预览</span>
+                            <div class="modal-close" onclick="closePaperPreview()">×</div>
+                        </div>
+                        <div id="paperPreviewContent" style="padding:20px;">
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -7012,6 +7124,429 @@
             
             showToast('归还成功！', 'success');
             showLibraryTab('borrowed');
+        }
+        
+        // ==================== 期中测试题库 ====================
+        
+        let manualQuestions = [];
+        let generatedQuestions = [];
+        let historyPapers = [];
+        
+        function showTestBankTab(tab) {
+            document.getElementById('tabAiGenerate').classList.add('hidden');
+            document.getElementById('tabManual').classList.add('hidden');
+            document.getElementById('tabHistory').classList.add('hidden');
+            
+            if (tab === 'ai-generate') {
+                document.getElementById('tabAiGenerate').classList.remove('hidden');
+            } else if (tab === 'manual') {
+                document.getElementById('tabManual').classList.remove('hidden');
+            } else if (tab === 'history') {
+                document.getElementById('tabHistory').classList.remove('hidden');
+                loadHistoryPapers();
+            }
+        }
+        
+        function generateQuestions() {
+            const course = document.getElementById('aiCourse').value;
+            const count = parseInt(document.getElementById('aiQuestionCount').value);
+            const type = document.getElementById('aiQuestionType').value;
+            
+            const questions = generateMockQuestions(course, count, type);
+            generatedQuestions = questions;
+            
+            let html = '';
+            questions.forEach((q, index) => {
+                html += `
+                    <div style="background:white;padding:20px;border-radius:8px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:15px;">
+                            <span style="padding:4px 12px;background:#667eea;color:white;border-radius:12px;font-size:12px;">${getTypeLabel(q.type)}</span>
+                            <span style="font-size:12px;color:#999;">第${index + 1}题</span>
+                        </div>
+                        <p style="margin:0 0 15px;font-size:15px;color:#333;line-height:1.6;">${q.question}</p>
+                        ${q.options ? `
+                            <div style="margin-bottom:15px;">
+                                ${q.options.map((opt, i) => `<div style="margin-bottom:8px;">${['A', 'B', 'C', 'D'][i]}. ${opt}</div>`).join('')}
+                            </div>
+                        ` : ''}
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:13px;color:#666;">答案：<span style="color:#4caf50;font-weight:bold;">${q.answer}</span></span>
+                            <span style="font-size:12px;color:#999;">解析：${q.explanation}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <button onclick="previewPaper()" style="margin-top:20px;padding:12px 30px;background:#4caf50;color:white;border:none;border-radius:8px;cursor:pointer;font-size:15px;">预览试卷</button>
+                <button onclick="saveGeneratedPaper()" style="margin-left:15px;padding:12px 30px;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;font-size:15px;">保存试卷</button>
+            `;
+            
+            document.getElementById('generatedQuestions').innerHTML = html;
+        }
+        
+        function generateMockQuestions(course, count, type) {
+            const questionBank = {
+                '高等数学': {
+                    choice: [
+                        { question: '函数 f(x) = x^2 在 x = 0 处的导数为：', options: ['0', '1', '2', '不存在'], answer: 'A', explanation: 'f\'(x) = 2x，当x=0时，f\'(0) = 0' },
+                        { question: '下列哪个是定积分的几何意义？', options: ['曲线下的面积', '切线斜率', '函数值', '极限'], answer: 'A', explanation: '定积分表示曲线与x轴围成的面积' },
+                        { question: '∫(0到1) x dx 的值为：', options: ['0.5', '1', '2', '0'], answer: 'A', explanation: '∫x dx = x²/2，代入上下限得0.5' },
+                        { question: '级数 Σ(1/n²) (n=1到∞) 是：', options: ['收敛的', '发散的', '条件收敛', '不确定'], answer: 'A', explanation: '这是p级数，p=2>1，收敛' },
+                        { question: '函数 y = sin(x) 的周期是：', options: ['2π', 'π', '4π', 'π/2'], answer: 'A', explanation: '正弦函数的周期是2π' }
+                    ],
+                    fill: [
+                        { question: '∫e^x dx = ______ + C', answer: 'e^x', explanation: 'e^x的积分等于它本身' },
+                        { question: '函数 f(x) = ln(x) 的定义域是 ______', answer: '(0, +∞)', explanation: '对数函数的定义域是正实数' },
+                        { question: '极限 lim(x→0) sin(x)/x = ______', answer: '1', explanation: '重要极限之一' },
+                        { question: '导数 d/dx (x^n) = ______', answer: 'n·x^(n-1)', explanation: '幂函数求导公式' },
+                        { question: '∫(1/x) dx = ______ + C', answer: 'ln|x|', explanation: '倒数函数的积分' }
+                    ],
+                    judge: [
+                        { question: '连续函数一定可导', answer: '错误', explanation: '连续是可导的必要条件，但不是充分条件' },
+                        { question: '可导函数一定连续', answer: '正确', explanation: '可导必连续' },
+                        { question: '定积分的值与积分变量的选取无关', answer: '正确', explanation: '定积分是一个确定的数值' },
+                        { question: '奇函数的定积分在对称区间上为0', answer: '正确', explanation: '奇函数在对称区间上的积分性质' },
+                        { question: '单调递增函数的导数一定大于0', answer: '错误', explanation: '可能等于0，如f(x)=x³' }
+                    ]
+                },
+                '线性代数': {
+                    choice: [
+                        { question: '单位矩阵的行列式值为：', options: ['1', '0', '-1', 'n'], answer: 'A', explanation: '单位矩阵的行列式等于1' },
+                        { question: '如果AB=0，则必有：', options: ['A=0或B=0', '|A|=0或|B|=0', 'A=B=0', '以上都不对'], answer: 'B', explanation: 'AB=0不能推出A=0或B=0，但行列式必有一个为0' },
+                        { question: '可逆矩阵的秩等于：', options: ['阶数', '0', '1', 'n-1'], answer: 'A', explanation: '可逆矩阵是满秩的' },
+                        { question: '对称矩阵的特征值都是：', options: ['实数', '复数', '正数', '负数'], answer: 'A', explanation: '对称矩阵的特征值都是实数' },
+                        { question: '两个矩阵等价的充要条件是：', options: ['秩相等', '行列式相等', '迹相等', '特征值相等'], answer: 'A', explanation: '矩阵等价的充要条件是秩相等' }
+                    ],
+                    fill: [
+                        { question: 'n阶行列式共有 ______ 项', answer: 'n!', explanation: 'n阶行列式展开共有n!项' },
+                        { question: '矩阵A的秩r(A) ≤ min(m, n)，其中m×n是矩阵的 ______', answer: '阶数', explanation: '矩阵秩的基本性质' },
+                        { question: '如果A是正交矩阵，则A^T = ______', answer: 'A^(-1)', explanation: '正交矩阵的转置等于逆' },
+                        { question: '相似矩阵有相同的 ______', answer: '特征值', explanation: '相似矩阵特征值相同' },
+                        { question: '齐次线性方程组有非零解的充要条件是系数矩阵的秩 ______ 未知数个数', answer: '<', explanation: '齐次方程组有非零解的条件' }
+                    ],
+                    judge: [
+                        { question: '初等变换不改变矩阵的秩', answer: '正确', explanation: '初等变换保持矩阵的秩不变' },
+                        { question: '行列式交换两行，行列式值不变', answer: '错误', explanation: '交换两行行列式变号' },
+                        { question: '如果A可逆，则A的特征值都不为0', answer: '正确', explanation: '可逆矩阵的行列式不为0，特征值乘积不为0' },
+                        { question: '正交矩阵的行列式等于1或-1', answer: '正确', explanation: '正交矩阵的性质' },
+                        { question: '若AB=AC，则B=C', answer: '错误', explanation: '矩阵乘法不满足消去律' }
+                    ]
+                },
+                '计算机网络': {
+                    choice: [
+                        { question: 'HTTP协议工作在OSI模型的哪一层？', options: ['应用层', '传输层', '网络层', '数据链路层'], answer: 'A', explanation: 'HTTP是应用层协议' },
+                        { question: 'TCP协议使用什么机制保证可靠传输？', options: ['三次握手', 'CRC校验', '加密', '以上都对'], answer: 'D', explanation: 'TCP使用多种机制保证可靠传输' },
+                        { question: 'IP地址192.168.1.1属于哪类地址？', options: ['C类', 'A类', 'B类', 'D类'], answer: 'A', explanation: '192开头是C类地址' },
+                        { question: 'DNS的作用是：', options: ['域名解析', '路由选择', '数据加密', '错误检测'], answer: 'A', explanation: 'DNS负责域名到IP地址的解析' },
+                        { question: 'HTTPS默认使用的端口是：', options: ['443', '80', '8080', '3000'], answer: 'A', explanation: 'HTTPS默认端口是443' }
+                    ],
+                    fill: [
+                        { question: 'TCP/IP协议族中，______ 层负责端到端的可靠传输', answer: '传输', explanation: '传输层负责端到端通信' },
+                        { question: '子网掩码255.255.255.0对应的子网前缀长度是 ______', answer: '/24', explanation: '24位掩码' },
+                        { question: '______ 协议用于文件传输', answer: 'FTP', explanation: 'FTP是文件传输协议' },
+                        { question: 'IPV4地址由 ______ 位二进制数组成', answer: '32', explanation: 'IPv4地址是32位' },
+                        { question: '______ 是TCP三次握手的第一步', answer: 'SYN', explanation: '第一次握手发送SYN' }
+                    ],
+                    judge: [
+                        { question: 'UDP是面向连接的协议', answer: '错误', explanation: 'UDP是无连接的' },
+                        { question: 'TCP比UDP更可靠', answer: '正确', explanation: 'TCP提供可靠传输' },
+                        { question: 'HTTP是无状态协议', answer: '正确', explanation: 'HTTP本身是无状态的' },
+                        { question: 'HTTPS是HTTP的安全版本', answer: '正确', explanation: 'HTTPS使用SSL/TLS加密' },
+                        { question: '路由器工作在数据链路层', answer: '错误', explanation: '路由器工作在网络层' }
+                    ]
+                }
+            };
+            
+            const result = [];
+            const availableTypes = type === 'mixed' ? ['choice', 'fill', 'judge'] : [type];
+            const bank = questionBank[course] || questionBank['高等数学'];
+            
+            for (let i = 0; i < count; i++) {
+                const qType = availableTypes[i % availableTypes.length];
+                const questionsOfType = bank[qType];
+                const randomIndex = Math.floor(Math.random() * questionsOfType.length);
+                result.push({ ...questionsOfType[randomIndex], type: qType });
+            }
+            
+            return result;
+        }
+        
+        function getTypeLabel(type) {
+            const labels = { choice: '选择题', fill: '填空题', judge: '判断题', short: '简答题' };
+            return labels[type] || '其他';
+        }
+        
+        function addQuestion() {
+            const type = document.getElementById('manualQuestionType').value;
+            const questionId = Date.now();
+            
+            let html = '';
+            if (type === 'choice') {
+                html = `
+                    <div style="background:white;padding:20px;border-radius:8px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                            <span class="badge badge-info">选择题</span>
+                            <button onclick="removeQuestion(${questionId})" style="padding:4px 10px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">删除</button>
+                        </div>
+                        <div style="margin-bottom:10px;">
+                            <input type="text" placeholder="请输入题目内容..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;" onchange="updateQuestion(${questionId}, 'question', this.value)">
+                        </div>
+                        <div style="display:flex;gap:10px;margin-bottom:10px;">
+                            <input type="text" placeholder="选项A" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;" onchange="updateQuestionOption(${questionId}, 'A', this.value)">
+                            <input type="text" placeholder="选项B" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;" onchange="updateQuestionOption(${questionId}, 'B', this.value)">
+                            <input type="text" placeholder="选项C" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;" onchange="updateQuestionOption(${questionId}, 'C', this.value)">
+                            <input type="text" placeholder="选项D" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;" onchange="updateQuestionOption(${questionId}, 'D', this.value)">
+                        </div>
+                        <div style="display:flex;gap:10px;">
+                            <select onchange="updateQuestion(${questionId}, 'answer', this.value)" style="padding:10px;border:1px solid #ddd;border-radius:6px;">
+                                <option value="">请选择正确答案</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                            </select>
+                            <input type="text" placeholder="解析（可选）" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;" onchange="updateQuestion(${questionId}, 'explanation', this.value)">
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'fill') {
+                html = `
+                    <div style="background:white;padding:20px;border-radius:8px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                            <span class="badge badge-warning">填空题</span>
+                            <button onclick="removeQuestion(${questionId})" style="padding:4px 10px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">删除</button>
+                        </div>
+                        <div style="margin-bottom:10px;">
+                            <input type="text" placeholder="请输入题目内容（用______表示填空处）..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;" onchange="updateQuestion(${questionId}, 'question', this.value)">
+                        </div>
+                        <div style="display:flex;gap:10px;">
+                            <input type="text" placeholder="答案" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;" onchange="updateQuestion(${questionId}, 'answer', this.value)">
+                            <input type="text" placeholder="解析（可选）" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;" onchange="updateQuestion(${questionId}, 'explanation', this.value)">
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'judge') {
+                html = `
+                    <div style="background:white;padding:20px;border-radius:8px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                            <span class="badge badge-success">判断题</span>
+                            <button onclick="removeQuestion(${questionId})" style="padding:4px 10px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">删除</button>
+                        </div>
+                        <div style="margin-bottom:10px;">
+                            <input type="text" placeholder="请输入题目内容..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;" onchange="updateQuestion(${questionId}, 'question', this.value)">
+                        </div>
+                        <div style="display:flex;gap:10px;">
+                            <select onchange="updateQuestion(${questionId}, 'answer', this.value)" style="padding:10px;border:1px solid #ddd;border-radius:6px;">
+                                <option value="">请选择答案</option>
+                                <option value="正确">正确</option>
+                                <option value="错误">错误</option>
+                            </select>
+                            <input type="text" placeholder="解析（可选）" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;" onchange="updateQuestion(${questionId}, 'explanation', this.value)">
+                        </div>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div style="background:white;padding:20px;border-radius:8px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                            <span class="badge badge-secondary">简答题</span>
+                            <button onclick="removeQuestion(${questionId})" style="padding:4px 10px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">删除</button>
+                        </div>
+                        <div style="margin-bottom:10px;">
+                            <textarea placeholder="请输入题目内容..." rows="3" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;resize:none;" onchange="updateQuestion(${questionId}, 'question', this.value)"></textarea>
+                        </div>
+                        <div style="margin-bottom:10px;">
+                            <textarea placeholder="参考答案..." rows="3" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;resize:none;" onchange="updateQuestion(${questionId}, 'answer', this.value)"></textarea>
+                        </div>
+                        <input type="text" placeholder="评分标准（可选）" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;" onchange="updateQuestion(${questionId}, 'explanation', this.value)">
+                    </div>
+                `;
+            }
+            
+            document.getElementById('questionList').innerHTML += html;
+            manualQuestions.push({ id: questionId, type: type, question: '', answer: '', options: {}, explanation: '' });
+        }
+        
+        function updateQuestion(id, key, value) {
+            const question = manualQuestions.find(q => q.id === id);
+            if (question) {
+                question[key] = value;
+            }
+        }
+        
+        function updateQuestionOption(id, option, value) {
+            const question = manualQuestions.find(q => q.id === id);
+            if (question) {
+                if (!question.options) question.options = {};
+                question.options[option] = value;
+            }
+        }
+        
+        function removeQuestion(id) {
+            manualQuestions = manualQuestions.filter(q => q.id !== id);
+            document.getElementById('questionList').innerHTML = '';
+            showToast('题目已删除', 'success');
+        }
+        
+        function savePaper() {
+            const title = document.getElementById('manualTitle').value.trim();
+            const course = document.getElementById('manualCourse').value;
+            
+            if (!title) {
+                showToast('请输入试卷标题', 'error');
+                return;
+            }
+            
+            if (manualQuestions.length === 0) {
+                showToast('请至少添加一道题目', 'error');
+                return;
+            }
+            
+            const paper = {
+                id: Date.now(),
+                title: title,
+                course: course,
+                questions: manualQuestions,
+                createdAt: new Date().toLocaleString('zh-CN')
+            };
+            
+            historyPapers.push(paper);
+            localStorage.setItem('historyPapers', JSON.stringify(historyPapers));
+            
+            showToast('试卷保存成功！', 'success');
+            document.getElementById('manualTitle').value = '';
+            document.getElementById('questionList').innerHTML = '';
+            manualQuestions = [];
+        }
+        
+        function saveGeneratedPaper() {
+            if (generatedQuestions.length === 0) {
+                showToast('请先生成题目', 'error');
+                return;
+            }
+            
+            const paper = {
+                id: Date.now(),
+                title: `${document.getElementById('aiCourse').value} - AI生成试卷`,
+                course: document.getElementById('aiCourse').value,
+                questions: generatedQuestions,
+                createdAt: new Date().toLocaleString('zh-CN'),
+                generatedByAI: true
+            };
+            
+            historyPapers.push(paper);
+            localStorage.setItem('historyPapers', JSON.stringify(historyPapers));
+            
+            showToast('试卷保存成功！', 'success');
+        }
+        
+        function previewPaper() {
+            const questions = generatedQuestions.length > 0 ? generatedQuestions : manualQuestions;
+            if (questions.length === 0) {
+                showToast('请先生成或添加题目', 'error');
+                return;
+            }
+            
+            let html = `
+                <h2 style="text-align:center;margin-bottom:20px;">${document.getElementById('aiCourse').value || document.getElementById('manualCourse').value} - 期中测试试卷</h2>
+                <p style="text-align:center;color:#666;margin-bottom:30px;">生成时间：${new Date().toLocaleString('zh-CN')}</p>
+            `;
+            
+            questions.forEach((q, index) => {
+                html += `
+                    <div style="margin-bottom:20px;">
+                        <p style="font-weight:bold;margin-bottom:10px;">${index + 1}. ${getTypeLabel(q.type)}：${q.question}</p>
+                        ${q.options ? `
+                            <div style="padding-left:20px;margin-bottom:10px;">
+                                ${Object.keys(q.options).map(opt => `<p>${opt}. ${q.options[opt]}</p>`).join('')}
+                            </div>
+                        ` : ''}
+                        <p style="color:#4caf50;font-style:italic;">答案：${q.answer}</p>
+                        ${q.explanation ? `<p style="color:#999;font-size:13px;">解析：${q.explanation}</p>` : ''}
+                    </div>
+                    <hr>
+                `;
+            });
+            
+            document.getElementById('paperPreviewContent').innerHTML = html;
+            document.getElementById('paperPreviewModal').classList.remove('hidden');
+        }
+        
+        function closePaperPreview() {
+            document.getElementById('paperPreviewModal').classList.add('hidden');
+        }
+        
+        function loadHistoryPapers() {
+            const stored = localStorage.getItem('historyPapers');
+            if (stored) {
+                try {
+                    historyPapers = JSON.parse(stored);
+                } catch (e) {
+                    historyPapers = [];
+                }
+            }
+            
+            if (historyPapers.length === 0) {
+                document.getElementById('historyPapers').innerHTML = '<p style="text-align:center;color:#999;padding:40px;">暂无历史试卷</p>';
+                return;
+            }
+            
+            let html = '';
+            historyPapers.forEach(paper => {
+                html += `
+                    <div style="background:white;padding:20px;border-radius:8px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <h4 style="margin:0 0 8px;font-size:16px;color:#333;">${paper.title} ${paper.generatedByAI ? '<span style="font-size:12px;color:#667eea;">(AI生成)</span>' : ''}</h4>
+                            <p style="margin:0;font-size:13px;color:#666;">课程：${paper.course} | 题目数：${paper.questions.length} | ${paper.createdAt}</p>
+                        </div>
+                        <div style="display:flex;gap:10px;">
+                            <button onclick="viewPaper(${paper.id})" style="padding:8px 16px;background:#667eea;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;">查看</button>
+                            <button onclick="deletePaper(${paper.id})" style="padding:8px 16px;background:#f44336;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;">删除</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('historyPapers').innerHTML = html;
+        }
+        
+        function viewPaper(paperId) {
+            const paper = historyPapers.find(p => p.id === paperId);
+            if (!paper) return;
+            
+            let html = `
+                <h2 style="text-align:center;margin-bottom:20px;">${paper.title}</h2>
+                <p style="text-align:center;color:#666;margin-bottom:30px;">课程：${paper.course} | 生成时间：${paper.createdAt}</p>
+            `;
+            
+            paper.questions.forEach((q, index) => {
+                html += `
+                    <div style="margin-bottom:20px;">
+                        <p style="font-weight:bold;margin-bottom:10px;">${index + 1}. ${getTypeLabel(q.type)}：${q.question}</p>
+                        ${q.options ? `
+                            <div style="padding-left:20px;margin-bottom:10px;">
+                                ${['A', 'B', 'C', 'D'].map(opt => `<p>${opt}. ${q.options[opt] || ''}</p>`).join('')}
+                            </div>
+                        ` : ''}
+                        <p style="color:#4caf50;font-style:italic;">答案：${q.answer}</p>
+                        ${q.explanation ? `<p style="color:#999;font-size:13px;">解析：${q.explanation}</p>` : ''}
+                    </div>
+                    <hr>
+                `;
+            });
+            
+            document.getElementById('paperPreviewContent').innerHTML = html;
+            document.getElementById('paperPreviewModal').classList.remove('hidden');
+        }
+        
+        function deletePaper(paperId) {
+            if (!confirm('确定要删除这份试卷吗？')) return;
+            
+            historyPapers = historyPapers.filter(p => p.id !== paperId);
+            localStorage.setItem('historyPapers', JSON.stringify(historyPapers));
+            loadHistoryPapers();
+            showToast('试卷已删除', 'success');
         }
 
         // 页面导航时加载数据
