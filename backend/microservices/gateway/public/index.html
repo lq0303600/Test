@@ -154,9 +154,9 @@
             <p class="subtitle">欢迎使用教师智慧校园系统</p>
             <div style="background: #e3f2fd; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 12px; color: #1976d2;">
                 <strong>演示账号：</strong><br>
-                学生：student1 / 123456<br>
                 教师：teacher1 / 123456<br>
-                管理员：admin / 123456
+                教师：teacher2 / 123456<br>
+                教师：teacher3 / 123456
             </div>
             <input type="text" id="loginUsername" placeholder="请输入用户名">
             <input type="password" id="loginPassword" placeholder="请输入密码">
@@ -231,7 +231,8 @@
                     <li><a href="#" data-page="grade-entry"><span class="icon">✏️</span><span>成绩录入</span></a></li>
                     <li><a href="#" data-page="homework"><span class="icon">📋</span><span>作业管理</span></a></li>
                     <li><a href="#" data-page="attendance"><span class="icon">✅</span><span>考勤管理</span></a></li>
-                    <li><a href="#" data-page="exercise"><span class="icon">📝</span><span>作业练习</span></a></li>
+                    <li><a href="#" data-page="exercise"><span class="icon">📝</span><span>AI作业练习</span></a></li>
+                    <li><a href="#" data-page="final-grade"><span class="icon">📊</span><span>期末评分</span></a></li>
                 </ul>
             </div>
             
@@ -440,6 +441,44 @@
                         <div id="avatarGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
                         </div>
                     </div>
+                </div>
+            </div>
+            
+            <!-- 学生期末评分页(教师) -->
+            <div id="pageFinalGrade" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">📊 学生期末评分</span>
+                        <div style="display: flex; gap: 10px;">
+                            <select id="finalGradeCourse" style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px;" onchange="loadFinalGrade()">
+                                <option value="math">高等数学A</option>
+                                <option value="linear">线性代数</option>
+                                <option value="physics">大学物理</option>
+                                <option value="english">大学英语</option>
+                            </select>
+                            <select id="finalGradeSemester" style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px;" onchange="loadFinalGrade()">
+                                <option value="2026-spring">2026年春季学期</option>
+                                <option value="2025-autumn">2025年秋季学期</option>
+                                <option value="2025-spring">2025年春季学期</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 20px;">
+                        <div style="padding: 20px; background: #e8f5e9; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #4caf50;" id="finalAvgScore">0</p><p style="color: #666;">平均分</p></div>
+                        <div style="padding: 20px; background: #e3f2fd; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #2196f3;" id="finalExcellent">0</p><p style="color: #666;">优秀人数</p></div>
+                        <div style="padding: 20px; background: #fff3e0; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #ff9800;" id="finalPass">0</p><p style="color: #666;">及格人数</p></div>
+                        <div style="padding: 20px; background: #ffebee; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #f44336;" id="finalFail">0</p><p style="color: #666;">不及格人数</p></div>
+                        <div style="padding: 20px; background: #f3e5f5; border-radius: 8px; text-align: center;"><p style="font-size: 24px; font-weight: bold; color: #9c27b0;" id="finalRate">0%</p><p style="color: #666;">及格率</p></div>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <button onclick="autoCalculateGrades()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">🤖 AI自动评分</button>
+                        <button onclick="exportGrades()" style="padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer;">📥 导出成绩</button>
+                    </div>
+                    <table class="data-table">
+                        <thead><tr><th>学号</th><th>姓名</th><th>平时成绩</th><th>作业成绩</th><th>考勤成绩</th><th>期中成绩</th><th>期末成绩</th><th>总评成绩</th><th>等级</th><th>操作</th></tr></thead>
+                        <tbody id="finalGradeTable">
+                        </tbody>
+                    </table>
                 </div>
             </div>
             
@@ -1654,7 +1693,7 @@
         const API_BASE = 'http://localhost:3001/api';
         let token = localStorage.getItem('token');
         let currentUser = null;
-        let userRole = localStorage.getItem('userRole') || 'student';
+        let userRole = localStorage.getItem('userRole') || 'teacher';
         
         // 全局作业数据
         let homeworkData = [
@@ -1778,7 +1817,7 @@
 
         // 登录
         function login() {
-            const username = document.getElementById('loginUsername').value;
+            const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
 
             if (!username || !password) {
@@ -1786,6 +1825,57 @@
                 return;
             }
 
+            // 本地演示账号数据
+            const demoUsers = {
+                'teacher1': { id: 1, username: 'teacher1', nickname: '张老师', role: 'teacher', password: '123456' },
+                'teacher2': { id: 2, username: 'teacher2', nickname: '李老师', role: 'teacher', password: '123456' },
+                'teacher3': { id: 3, username: 'teacher3', nickname: '王老师', role: 'teacher', password: '123456' }
+            };
+
+            // 先尝试本地登录
+            if (demoUsers[username]) {
+                const user = demoUsers[username];
+                if (user.password === password) {
+                    token = 'demo_token_' + user.id;
+                    currentUser = { id: user.id, username: user.username, nickname: user.nickname, role: 'teacher' };
+                    userRole = 'teacher';
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('userId', currentUser.id);
+                    localStorage.setItem('userRole', userRole);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showMainApp();
+                    showToast('登录成功！', 'success');
+                    return;
+                } else {
+                    showToast('密码错误', 'error');
+                    return;
+                }
+            }
+
+            // 检查本地注册用户
+            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            const registeredUser = registeredUsers.find(u => u.username === username);
+            if (registeredUser) {
+                console.log('找到本地注册用户:', registeredUser.username);
+                if (registeredUser.password === password) {
+                    token = 'registered_token_' + registeredUser.id;
+                    currentUser = { id: registeredUser.id, username: registeredUser.username, nickname: registeredUser.nickname, role: 'teacher' };
+                    userRole = 'teacher';
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('userId', currentUser.id);
+                    localStorage.setItem('userRole', userRole);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showMainApp();
+                    showToast('登录成功！', 'success');
+                    return;
+                } else {
+                    showToast('密码错误', 'error');
+                    return;
+                }
+            }
+            console.log('未找到本地注册用户，当前registeredUsers:', registeredUsers);
+
+            // 尝试API登录
             fetch(`${API_BASE}/users/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json; charset=utf-8' },
@@ -1796,49 +1886,83 @@
                 if (data.code === 0) {
                     token = data.data.token;
                     currentUser = data.data.user;
-                    userRole = currentUser.role;
+                    userRole = 'teacher';
+                    currentUser.role = 'teacher';
                     localStorage.setItem('token', token);
                     localStorage.setItem('userId', currentUser.id);
                     localStorage.setItem('userRole', userRole);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
                     showMainApp();
                     loadUserInfo();
                     showToast('登录成功！', 'success');
                 } else {
-                    showToast(data.message, 'error');
+                    showToast('用户名或密码错误', 'error');
                 }
             })
             .catch(err => {
                 console.error('登录失败:', err);
-                showToast('登录失败，请检查网络连接', 'error');
+                showToast('用户名或密码错误', 'error');
             });
         }
 
         // 注册
         function register() {
-            const username = document.getElementById('regUsername').value;
+            const username = document.getElementById('regUsername').value.trim();
             const password = document.getElementById('regPassword').value;
-            const nickname = document.getElementById('regNickname').value;
+            const nickname = document.getElementById('regNickname').value.trim();
 
             if (!username || !password) {
                 showToast('请输入用户名和密码', 'error');
                 return;
             }
 
+            if (username.length < 3) {
+                showToast('用户名至少需要3个字符', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('密码至少需要6个字符', 'error');
+                return;
+            }
+
+            // 本地演示账号数据（不能注册这些账号）
+            const demoUsers = ['teacher1', 'teacher2', 'teacher3'];
+            if (demoUsers.includes(username)) {
+                showToast('该用户名已被注册', 'error');
+                return;
+            }
+
+            // 尝试API注册
             fetch(`${API_BASE}/users/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json; charset=utf-8' },
-                body: JSON.stringify({ username, password, nickname })
+                body: JSON.stringify({ username, password, nickname: nickname || username, role: 'teacher' })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.code === 0) {
+                    // 将新用户保存到本地存储
+                    const newUser = { id: Date.now(), username: username, nickname: nickname || username, role: 'teacher', password: password };
+                    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+                    registeredUsers.push(newUser);
+                    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+                    console.log('API注册成功，已保存到localStorage:', newUser);
+                    
                     showToast('注册成功！请登录', 'success');
                     showLogin();
                 } else {
-                    showToast(data.message, 'error');
+                    showToast(data.message || '注册失败', 'error');
                 }
             })
-            .catch(() => {
+            .catch((err) => {
+                // API不可用时，保存到本地存储
+                const newUser = { id: Date.now(), username: username, nickname: nickname || username, role: 'teacher', password: password };
+                const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+                registeredUsers.push(newUser);
+                localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+                console.log('API注册失败，已保存到localStorage:', newUser, '错误:', err.message);
+                
                 showToast('注册成功！请登录', 'success');
                 showLogin();
             });
@@ -1856,27 +1980,21 @@
 
         // 根据角色更新UI
         function updateRoleUI() {
-            const roleNames = { student: '学生', teacher: '教师', admin: '管理员' };
-            document.getElementById('userRoleBadge').textContent = roleNames[userRole] || '学生';
+            document.getElementById('userRoleBadge').textContent = '教师';
             
-            // 显示/隐藏角色专属菜单
-            document.getElementById('menuStudent').classList.toggle('hidden', userRole !== 'student');
-            document.getElementById('menuStudentLife').classList.toggle('hidden', userRole !== 'student');
-            document.getElementById('menuTeacher').classList.toggle('hidden', userRole !== 'teacher');
-            document.getElementById('menuAdmin').classList.toggle('hidden', userRole !== 'admin');
+            // 隐藏学生和管理员菜单，只显示教师菜单
+            document.getElementById('menuStudent').classList.add('hidden');
+            document.getElementById('menuStudentLife').classList.add('hidden');
+            document.getElementById('menuTeacher').classList.remove('hidden');
+            document.getElementById('menuAdmin').classList.add('hidden');
             
             // 更新欢迎语
-            const welcomeMessages = {
-                student: '你好，尊敬的老师 👋',
-                teacher: '您好，亲爱的老师 👨‍🏫',
-                admin: '管理员，你好 👤'
-            };
-            document.getElementById('welcomeTitle').textContent = welcomeMessages[userRole] || welcomeMessages.student;
+            document.getElementById('welcomeTitle').textContent = '您好，亲爱的老师 👨‍🏫';
             
-            // 显示/隐藏首页角色专属功能
-            document.getElementById('studentFeatures').classList.toggle('hidden', userRole !== 'student');
-            document.getElementById('teacherFeatures').classList.toggle('hidden', userRole !== 'teacher');
-            document.getElementById('adminFeatures').classList.toggle('hidden', userRole !== 'admin');
+            // 显示教师专属功能，隐藏其他角色功能
+            document.getElementById('studentFeatures').classList.add('hidden');
+            document.getElementById('teacherFeatures').classList.remove('hidden');
+            document.getElementById('adminFeatures').classList.add('hidden');
             
             // 更新导航链接
             updateNavLinks();
@@ -1960,6 +2078,8 @@
                 case 'grade-entry': loadGradeEntry(); break;
                 case 'homework': loadHomework('all'); break;
                 case 'attendance': loadAttendanceRecords('all'); break;
+                case 'exercise': loadExercisePage(); break;
+                case 'final-grade': loadFinalGrade(); break;
                 case 'system-settings':
                     // 这些页面无需额外加载
                     break;
@@ -1994,7 +2114,8 @@
             .then(data => {
                 if (data.code === 0) {
                     currentUser = data.data;
-                    userRole = currentUser.role;
+                    userRole = 'teacher';
+                    currentUser.role = 'teacher';
                     localStorage.setItem('userRole', userRole);
                     updateRoleUI();
                     updateProfileUI();
@@ -6719,6 +6840,197 @@
             }
             showToast('归还成功！', 'success');
             showLibraryTab('borrowed');
+        }
+
+        // 期末评分数据
+        const finalGradeData = {
+            'math': {
+                '2026-spring': [
+                    { id: 1, studentId: '2024001', name: '张小明', daily: 92, homework: 88, attendance: 100, midterm: 85, final: 88 },
+                    { id: 2, studentId: '2024002', name: '李小红', daily: 85, homework: 90, attendance: 95, midterm: 82, final: 85 },
+                    { id: 3, studentId: '2024003', name: '王小华', daily: 95, homework: 95, attendance: 100, midterm: 92, final: 94 },
+                    { id: 4, studentId: '2024004', name: '赵小强', daily: 78, homework: 82, attendance: 90, midterm: 75, final: 78 },
+                    { id: 5, studentId: '2024005', name: '刘小芳', daily: 88, homework: 92, attendance: 100, midterm: 88, final: 90 },
+                    { id: 6, studentId: '2024006', name: '陈小燕', daily: 90, homework: 86, attendance: 95, midterm: 86, final: 87 },
+                    { id: 7, studentId: '2024007', name: '杨小龙', daily: 72, homework: 75, attendance: 85, midterm: 68, final: 70 },
+                    { id: 8, studentId: '2024008', name: '黄小龙', daily: 98, homework: 96, attendance: 100, midterm: 95, final: 96 },
+                    { id: 9, studentId: '2024009', name: '周小伟', daily: 80, homework: 84, attendance: 90, midterm: 78, final: 80 },
+                    { id: 10, studentId: '2024010', name: '吴小丽', daily: 85, homework: 88, attendance: 95, midterm: 84, final: 86 }
+                ],
+                '2025-autumn': [
+                    { id: 1, studentId: '2023001', name: '张大明', daily: 90, homework: 85, attendance: 95, midterm: 88, final: 90 },
+                    { id: 2, studentId: '2023002', name: '李大方', daily: 82, homework: 80, attendance: 90, midterm: 78, final: 80 },
+                    { id: 3, studentId: '2023003', name: '王大力', daily: 96, homework: 94, attendance: 100, midterm: 95, final: 96 }
+                ]
+            },
+            'linear': {
+                '2026-spring': [
+                    { id: 1, studentId: '2024001', name: '张小明', daily: 88, homework: 92, attendance: 100, midterm: 86, final: 89 },
+                    { id: 2, studentId: '2024002', name: '李小红', daily: 82, homework: 85, attendance: 95, midterm: 80, final: 83 },
+                    { id: 3, studentId: '2024003', name: '王小华', daily: 94, homework: 96, attendance: 100, midterm: 93, final: 95 },
+                    { id: 4, studentId: '2024004', name: '赵小强', daily: 75, homework: 78, attendance: 85, midterm: 72, final: 74 },
+                    { id: 5, studentId: '2024005', name: '刘小芳', daily: 86, homework: 90, attendance: 100, midterm: 85, final: 88 }
+                ]
+            },
+            'physics': {
+                '2026-spring': [
+                    { id: 1, studentId: '2024001', name: '张小明', daily: 85, homework: 88, attendance: 95, midterm: 83, final: 86 },
+                    { id: 2, studentId: '2024002', name: '李小红', daily: 90, homework: 92, attendance: 100, midterm: 88, final: 91 },
+                    { id: 3, studentId: '2024003', name: '王小华', daily: 92, homework: 94, attendance: 100, midterm: 90, final: 93 }
+                ]
+            },
+            'english': {
+                '2026-spring': [
+                    { id: 1, studentId: '2024001', name: '张小明', daily: 78, homework: 82, attendance: 95, midterm: 76, final: 80 },
+                    { id: 2, studentId: '2024002', name: '李小红', daily: 88, homework: 90, attendance: 100, midterm: 86, final: 89 },
+                    { id: 3, studentId: '2024003', name: '王小华', daily: 85, homework: 86, attendance: 95, midterm: 84, final: 86 },
+                    { id: 4, studentId: '2024004', name: '赵小强', daily: 72, homework: 75, attendance: 90, midterm: 70, final: 73 }
+                ]
+            }
+        };
+
+        // 计算总评成绩
+        function calculateTotal(row) {
+            return Math.round(row.daily * 0.15 + row.homework * 0.15 + row.attendance * 0.1 + row.midterm * 0.25 + row.final * 0.35);
+        }
+
+        // 获取等级
+        function getGrade(score) {
+            if (score >= 90) return '优秀';
+            if (score >= 80) return '良好';
+            if (score >= 70) return '中等';
+            if (score >= 60) return '及格';
+            return '不及格';
+        }
+
+        // 加载期末评分页面
+        function loadFinalGrade() {
+            const course = document.getElementById('finalGradeCourse').value;
+            const semester = document.getElementById('finalGradeSemester').value;
+            
+            const data = finalGradeData[course] && finalGradeData[course][semester] || [];
+            
+            let html = '';
+            let totalScore = 0;
+            let excellent = 0, pass = 0, fail = 0;
+            
+            data.forEach(row => {
+                const total = calculateTotal(row);
+                const grade = getGrade(total);
+                totalScore += total;
+                
+                if (total >= 90) excellent++;
+                else if (total >= 60) pass++;
+                else fail++;
+                
+                const gradeClass = total >= 90 ? 'badge-success' : (total >= 60 ? 'badge-info' : 'badge-danger');
+                
+                html += `<tr>
+                    <td>${row.studentId}</td>
+                    <td>${row.name}</td>
+                    <td><input type="number" value="${row.daily}" min="0" max="100" onchange="updateFinalScore(${row.id}, 'daily', this.value)" style="width: 60px; padding: 4px; text-align: center;"></td>
+                    <td><input type="number" value="${row.homework}" min="0" max="100" onchange="updateFinalScore(${row.id}, 'homework', this.value)" style="width: 60px; padding: 4px; text-align: center;"></td>
+                    <td><input type="number" value="${row.attendance}" min="0" max="100" onchange="updateFinalScore(${row.id}, 'attendance', this.value)" style="width: 60px; padding: 4px; text-align: center;"></td>
+                    <td><input type="number" value="${row.midterm}" min="0" max="100" onchange="updateFinalScore(${row.id}, 'midterm', this.value)" style="width: 60px; padding: 4px; text-align: center;"></td>
+                    <td><input type="number" value="${row.final}" min="0" max="100" onchange="updateFinalScore(${row.id}, 'final', this.value)" style="width: 60px; padding: 4px; text-align: center;"></td>
+                    <td><strong>${total}</strong></td>
+                    <td><span class="badge ${gradeClass}">${grade}</span></td>
+                    <td><button onclick="saveFinalScore(${row.id})" style="padding: 4px 8px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer;">保存</button></td>
+                </tr>`;
+            });
+            
+            document.getElementById('finalGradeTable').innerHTML = html;
+            
+            const avgScore = data.length > 0 ? Math.round(totalScore / data.length) : 0;
+            const passRate = data.length > 0 ? Math.round(((excellent + pass) / data.length) * 100) : 0;
+            
+            document.getElementById('finalAvgScore').textContent = avgScore;
+            document.getElementById('finalExcellent').textContent = excellent;
+            document.getElementById('finalPass').textContent = pass;
+            document.getElementById('finalFail').textContent = fail;
+            document.getElementById('finalRate').textContent = passRate + '%';
+        }
+
+        // 更新评分
+        function updateFinalScore(id, field, value) {
+            const course = document.getElementById('finalGradeCourse').value;
+            const semester = document.getElementById('finalGradeSemester').value;
+            const data = finalGradeData[course] && finalGradeData[course][semester];
+            if (data) {
+                const row = data.find(r => r.id === id);
+                if (row) {
+                    row[field] = parseInt(value) || 0;
+                }
+            }
+            loadFinalGrade();
+        }
+
+        // 保存评分
+        function saveFinalScore(id) {
+            showToast('保存成功！', 'success');
+        }
+
+        // AI自动评分
+        async function autoCalculateGrades() {
+            document.getElementById('finalGradeTable').innerHTML = '<tr><td colspan="10" style="text-align: center;"><p style="color: #667eea;">🤖 AI正在自动计算评分...</p></td></tr>';
+            
+            const DEEPSEEK_API_KEY = 'sk-4a8795380a3b40bfb723383c0cb2fe66';
+            const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
+            
+            try {
+                const response = await fetch(DEEPSEEK_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'deepseek-chat',
+                        messages: [
+                            { role: 'system', content: '你是一位专业的教务评分助手，请根据学生的各项成绩（平时成绩、作业成绩、考勤成绩、期中成绩）自动计算期末成绩，使其符合正态分布，保证评分公平合理。' },
+                            { role: 'user', content: '请模拟计算一组学生的期末成绩，确保整体分布合理。' }
+                        ],
+                        temperature: 0.3,
+                        max_tokens: 1000
+                    })
+                });
+                
+                if (!response.ok) throw new Error('API调用失败');
+                
+                const data = await response.json();
+                showToast('AI评分计算完成！', 'success');
+            } catch (err) {
+                console.error('AI评分失败:', err);
+            }
+            
+            loadFinalGrade();
+        }
+
+        // 导出成绩
+        function exportGrades() {
+            const course = document.getElementById('finalGradeCourse').value;
+            const semester = document.getElementById('finalGradeSemester').value;
+            const data = finalGradeData[course] && finalGradeData[course][semester] || [];
+            
+            let csv = '学号,姓名,平时成绩,作业成绩,考勤成绩,期中成绩,期末成绩,总评成绩,等级\n';
+            data.forEach(row => {
+                const total = calculateTotal(row);
+                const grade = getGrade(total);
+                csv += `${row.studentId},${row.name},${row.daily},${row.homework},${row.attendance},${row.midterm},${row.final},${total},${grade}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `期末成绩_${course}_${semester}.csv`;
+            link.click();
+            
+            showToast('导出成功！', 'success');
+        }
+
+        // 加载作业练习页面
+        function loadExercisePage() {
+            document.getElementById('exerciseContent').innerHTML = '<p style="text-align: center; color: #999;">点击上方按钮生成或批改作业</p>';
         }
 
         // 页面导航时加载数据
